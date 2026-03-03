@@ -18,19 +18,27 @@ function renderArticles() {
   const filterIssue = document.getElementById("filter-issue");
 
   // 🔴 CRITICAL GUARD
-  if (!grid || !searchBox || !filterIssue) return;
+  if (!grid) return;
 
   const articles = getArticles();
 
-  // Populate issue filter
-  const issues = [...new Set(Object.values(articles).map(a => a.issue))].sort((a,b)=>a-b);
-  filterIssue.innerHTML =
-    `<option value="">All Issues</option>` +
-    issues.map(i => `<option value="${i}">Issue ${i}</option>`).join("");
+  // Populate issue filter if present
+  if (filterIssue) {
+    const issues = [...new Set(Object.values(articles).map(a => a.issue))].sort((a,b)=>a-b);
+    filterIssue.innerHTML =
+      `<option value="">All Issues</option>` +
+      issues.map(i => `<option value="${i}">Issue ${i}</option>`).join("");
+
+    filterIssue.addEventListener("change", display);
+  }
+
+  if (searchBox) searchBox.addEventListener("input", display);
+
+  display();
 
   function display() {
-    const query = searchBox.value.toLowerCase();
-    const issueFilter = filterIssue.value;
+    const query = searchBox ? searchBox.value.toLowerCase() : "";
+    const issueFilter = filterIssue ? filterIssue.value : "";
 
     grid.innerHTML = "";
 
@@ -54,10 +62,6 @@ function renderArticles() {
       grid.appendChild(card);
     });
   }
-
-  searchBox.addEventListener("input", display);
-  filterIssue.addEventListener("change", display);
-  display();
 }
 
 // ==========================
@@ -74,7 +78,6 @@ function openArticle(id) {
 function renderArticlePage() {
   const container = document.getElementById("article-container");
 
-  // 🔴 CRITICAL GUARD
   if (!container) return;
 
   const articles = getArticles();
@@ -92,7 +95,12 @@ function renderArticlePage() {
       <h1 class="article-title">${a.title.toUpperCase()}</h1>
       <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
       ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <p class="article-content">${a.content}</p>
+      <div class="article-content">${a.content}</div>
     </article>
   `;
+}
+
+// Optional: initialize articles if none exist
+if (!localStorage.getItem("articles")) {
+  saveArticles({});
 }
