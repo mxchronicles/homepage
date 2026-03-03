@@ -1,103 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MX Chronicles · Articles</title>
-
-<link rel="stylesheet" href="style.css">
-<script src="data.js" defer></script>
-<script src="articles.js" defer></script>
+  <meta charset="UTF-8">
+  <title>Articles - MXChronicles</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
-<body onload="renderArticles()">
-
-<!-- TOP BAR -->
-<header class="top-bar">
-  <div class="masthead">MX CHRONICLES</div>
-  <nav class="top-nav">
-    <a href="index.html">HOME</a>
-    <a href="articles.html" class="active">ARTICLES</a>
-    <a href="about.html">ABOUT</a>
-    <a href="staff.html">STAFF PORTAL</a>
-  </nav>
-</header>
-
-<!-- MAIN CONTENT -->
-<main class="articles-main" style="padding:2rem;">
-
-  <!-- Search & Filter -->
-  <div style="margin-bottom:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
-    <input type="text" id="search-box" placeholder="Search by title, author, content..." style="padding:0.5rem; flex:1; min-width:200px;">
-    <select id="filter-issue" style="padding:0.5rem; min-width:120px;"></select>
+<body>
+  <div class="top-bar">
+    <div class="masthead">MXChronicles</div>
+    <div class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="articles.html">Articles</a>
+      <a href="about.html">About</a>
+      <a href="staff-portal.html">Staff Portal</a>
+    </div>
   </div>
 
-  <!-- Articles Grid -->
-  <div id="articles-grid" class="article-grid"></div>
+  <div id="articles-grid"></div>
 
-</main>
+  <script>
+    const articlesGrid = document.getElementById("articles-grid");
+    let articles = JSON.parse(localStorage.getItem("articles")) || [];
 
-<script>
-// ============================
-// Render Articles Function
-// ============================
-function renderArticles() {
-  const grid = document.getElementById("articles-grid");
-  if (!grid) return;
+    function renderArticles() {
+      articlesGrid.innerHTML = "";
+      articles.forEach(article => {
+        const card = document.createElement("div");
+        card.className = "article-card";
+        card.innerHTML = `
+          <h2>${article.title.toUpperCase()}</h2>
+          <p class="meta">${article.author || ""} • ${article.date || ""}</p>
+          <p>${article.synopsis || ""}</p>
+          <a href="article.html?id=${article.id}">Read More</a>
+        `;
+        articlesGrid.appendChild(card);
+      });
+    }
 
-  const searchBox = document.getElementById("search-box");
-  const filterIssue = document.getElementById("filter-issue");
-
-  // Populate issue dropdown
-  const allIssues = [...new Set(Object.values(articles).map(a => a.issue))].sort((a,b)=>a-b);
-  filterIssue.innerHTML = '<option value="">All Issues</option>' +
-    allIssues.map(i=>`<option value="${i}">Issue ${i}</option>`).join('');
-
-  // Function to display filtered articles
-  function displayArticles() {
-    const query = searchBox.value.toLowerCase();
-    const selectedIssue = filterIssue.value;
-    grid.innerHTML = '';
-
-    Object.entries(articles).forEach(([id,a])=>{
-      // Filter by issue
-      if(selectedIssue && a.issue != selectedIssue) return;
-
-      // Filter by query
-      const combinedText = `${a.title} ${a.author} ${a.content}`.toLowerCase();
-      if(query && !combinedText.includes(query)) return;
-
-      // Create article card
-      const card = document.createElement('div');
-      card.className = 'article-card';
-      card.onclick = () => openArticle(id);
-
-      card.innerHTML = `
-        <h2 class="article-title">${a.title.toUpperCase()}</h2>
-        <div class="article-meta">By ${a.author} · ${a.date} · Issue ${a.issue}</div>
-        ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ''}
-        <p class="article-synopsis">${a.content.slice(0, 180)}...</p>
-      `;
-      grid.appendChild(card);
-    });
-  }
-
-  // Attach events
-  searchBox.addEventListener('input', displayArticles);
-  filterIssue.addEventListener('change', displayArticles);
-
-  // Initial render
-  displayArticles();
-}
-
-// ============================
-// Open Article Function
-// ============================
-function openArticle(id){
-  localStorage.setItem('currentArticle', id);
-  window.location.href = 'article.html';
-}
-</script>
-
+    renderArticles();
+  </script>
 </body>
 </html>
