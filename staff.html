@@ -9,19 +9,17 @@
 </head>
 <body>
 
-<!-- PASSWORD OVERLAY -->
-<div id="password-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; display:flex; justify-content:center; align-items:center; z-index:999;">
-  <div style="background:#fbf8f2; padding:2rem; border:5px solid #8b0000; text-align:center; border-radius:10px;">
+<div id="password-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000a;display:flex;justify-content:center;align-items:center;z-index:999;">
+  <div style="background:#fbf8f2;padding:2rem;border:5px solid #8b0000;text-align:center;border-radius:10px;">
     <h2 style="font-family:'Merriweather', serif;">Enter Staff Portal Password</h2>
-    <input type="password" id="staff-password" placeholder="Password" style="padding:0.5rem; margin-top:1rem; width:80%;">
+    <input type="password" id="staff-password" placeholder="Password" style="padding:0.5rem;margin-top:1rem;width:80%;">
     <br>
-    <button onclick="checkPassword()" style="margin-top:1rem; padding:0.5rem 1rem;">Enter</button>
-    <p id="password-error" style="color:red; margin-top:0.5rem; display:none;">Incorrect password</p>
+    <button onclick="checkPassword()" style="margin-top:1rem;padding:0.5rem 1rem;">Enter</button>
+    <p id="password-error" style="color:red;margin-top:0.5rem;display:none;">Incorrect password</p>
   </div>
 </div>
 
-<!-- STAFF PORTAL -->
-<main id="staff-portal" style="display:none; padding:2rem;">
+<main id="staff-portal" style="display:none;padding:2rem;">
 
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
@@ -33,7 +31,6 @@
   </nav>
 </header>
 
-<!-- STAFF MANAGEMENT -->
 <section style="margin-bottom:2rem;">
   <h2>Staff Members</h2>
   <div id="staff-list" style="margin-bottom:1rem;"></div>
@@ -41,23 +38,9 @@
   <button onclick="addStaff()">Add Staff</button>
 </section>
 
-<!-- NEW ARTICLE CREATION -->
-<section style="margin-bottom:2rem;">
-  <h2>Create New Article</h2>
-  <form id="new-article-form" style="border:2px solid black; padding:1rem; background:#fffdf7;">
-    <input type="text" name="title" placeholder="Article Title" style="width:100%; margin:0.5rem 0;" required>
-    <input type="text" name="author" placeholder="Author" style="width:100%; margin:0.5rem 0;" required>
-    <input type="date" name="date" placeholder="Date" style="width:100%; margin:0.5rem 0;" required>
-    <input type="number" name="issue" placeholder="Issue Number" style="width:100%; margin:0.5rem 0;" required>
-    <textarea name="content" placeholder="Content" style="width:100%; height:120px; margin:0.5rem 0;" required></textarea>
-    <input type="text" name="image" placeholder="Image URL (optional)" style="width:100%; margin:0.5rem 0;">
-    <button type="submit">Add Article</button>
-  </form>
-</section>
-
-<!-- EXISTING ARTICLES MANAGEMENT -->
 <section>
-  <h2>Existing Articles</h2>
+  <h2>Articles</h2>
+  <button onclick="downloadArticles()">Download JSON</button>
   <div class="article-grid" id="staff-articles"></div>
 </section>
 
@@ -76,57 +59,51 @@ function checkPassword(){
   }
 }
 
-// -----------------------
 // STAFF MANAGEMENT
-// -----------------------
-function getStaff(){
-  return JSON.parse(localStorage.getItem('staff')) || [];
-}
-function saveStaff(staff){
-  localStorage.setItem('staff', JSON.stringify(staff));
-}
+function getStaff(){ return JSON.parse(localStorage.getItem('staff'))||[]; }
+function saveStaff(staff){ localStorage.setItem('staff',JSON.stringify(staff)); }
+
 function renderStaffList(){
   const staffContainer = document.getElementById('staff-list');
   const staff = getStaff();
   staffContainer.innerHTML = '';
-  staff.forEach((name, idx)=>{
+  staff.forEach((name,idx)=>{
     const div = document.createElement('div');
-    div.className = 'staff-name';
-    div.style.marginBottom = '0.5rem';
-    div.innerHTML = `${name} <button onclick="removeStaff(${idx})">Remove</button>`;
+    div.className='staff-name';
+    div.style.marginBottom='0.5rem';
+    div.innerHTML=`${name} <button onclick="removeStaff(${idx})">Remove</button>`;
     staffContainer.appendChild(div);
   });
 }
+
 function addStaff(){
-  const input = document.getElementById('new-staff');
-  let staff = getStaff();
-  const name = input.value.trim();
+  const input=document.getElementById('new-staff');
+  let staff=getStaff();
+  const name=input.value.trim();
   if(name){
     staff.push(name);
-    input.value = '';
+    input.value='';
     saveStaff(staff);
     renderStaffList();
   }
 }
+
 function removeStaff(idx){
-  let staff = getStaff();
+  let staff=getStaff();
   staff.splice(idx,1);
   saveStaff(staff);
   renderStaffList();
 }
 
-// -----------------------
 // ARTICLE MANAGEMENT
-// -----------------------
-function renderStaffArticles(){
-  const articles = getArticles();
-  const grid = document.getElementById('staff-articles');
-  grid.innerHTML = '';
-
+async function renderStaffArticles(){
+  const grid=document.getElementById('staff-articles');
+  const articles=await getArticles();
+  grid.innerHTML='';
   Object.entries(articles).forEach(([id,a])=>{
-    const div = document.createElement('div');
-    div.className = 'article-card';
-    div.innerHTML = `
+    const div=document.createElement('div');
+    div.className='article-card';
+    div.innerHTML=`
       <form onsubmit="saveArticle(event,'${id}')">
         <h2 class="article-title">Edit: ${a.title.toUpperCase()}</h2>
         <div class="article-meta">
@@ -135,7 +112,7 @@ function renderStaffArticles(){
           Date: <input type="date" name="date" value="${a.date}">
         </div>
         <input type="text" name="title" value="${a.title}" style="width:100%; margin:0.5rem 0;">
-        <textarea name="content" style="width:100%; height:100px;">${a.content}</textarea>
+        <textarea name="content" style="width:100%; height:120px;">${a.content}</textarea>
         ${a.image?`<img src="${a.image}" style="width:100%; margin:0.5rem 0;">`:''}
         <div style="margin-top:0.5rem;">
           <button type="submit">Save</button>
@@ -148,70 +125,48 @@ function renderStaffArticles(){
   });
 }
 
-// SAVE EXISTING ARTICLE
 function saveArticle(e,id){
   e.preventDefault();
-  const form = e.target;
-  const articles = getArticles();
-  const a = articles[id];
-  a.title = form.title.value;
-  a.author = form.author.value;
-  a.date = form.date.value;
-  a.issue = form.issue.value;
-  a.content = form.content.value;
-  a.image = form.image ? form.image.value : "";
+  const form=e.target;
+  const articles=articlesCache;
+  const a=articles[id];
+  a.title=form.title.value;
+  a.author=form.author.value;
+  a.date=form.date.value;
+  a.issue=form.issue.value;
+  a.content=form.content.value;
   saveArticles(articles);
   renderStaffArticles();
 }
 
-// DELETE ARTICLE
 function deleteArticle(id){
   if(confirm("Delete this article?")){
-    const articles = getArticles();
+    const articles=articlesCache;
     delete articles[id];
     saveArticles(articles);
     renderStaffArticles();
   }
 }
 
-// FEATURE/UNFEATURE ARTICLE
 function toggleFeature(id){
-  const articles = getArticles();
-  articles[id].featured = !articles[id].featured;
+  const articles=articlesCache;
+  articles[id].featured=!articles[id].featured;
   saveArticles(articles);
   renderStaffArticles();
 }
 
-// -----------------------
-// CREATE NEW ARTICLE
-// -----------------------
-document.getElementById('new-article-form').addEventListener('submit', function(e){
-  e.preventDefault();
-  const form = e.target;
-  const articles = getArticles();
-  const id = Date.now().toString(); // simple unique ID
-
-  articles[id] = {
-    title: form.title.value,
-    author: form.author.value,
-    date: form.date.value,
-    issue: form.issue.value,
-    content: form.content.value,
-    image: form.image.value || "",
-    featured: false
-  };
-
-  saveArticles(articles);
-  form.reset();
-  renderStaffArticles();
-});
-
-// -----------------------
-// RENDER STAFF PORTAL
-// -----------------------
 function renderStaffPortal(){
   renderStaffList();
   renderStaffArticles();
+}
+
+// Download articles JSON
+function downloadArticles(){
+  const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(articlesCache,null,2));
+  const dlAnchor=document.createElement('a');
+  dlAnchor.setAttribute("href",dataStr);
+  dlAnchor.setAttribute("download","articles.json");
+  dlAnchor.click();
 }
 </script>
 </body>
