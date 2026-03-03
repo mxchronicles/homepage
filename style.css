@@ -223,3 +223,9 @@ body::before {
   margin: 1rem 0;
   filter: grayscale(30%);
 }
+
+body.home-bg {
+  background-image: url("renaissance-background.jpg");
+  background-size: cover;
+  background-position: center;
+}
