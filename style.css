@@ -8,39 +8,57 @@
   box-sizing: border-box;
 }
 
+/* =========================
+   BODY (NEWSPAPER BASE)
+========================= */
+
 body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background: #f4f1ea;
-  color: #111;
-  line-height: 1.6;
+  font-family: Georgia, "Times New Roman", serif;
+  background-color: #f3efe6;
+  background-image: url("paper-texture.jpg"); /* optional texture file */
+  background-size: cover;
+  background-attachment: fixed;
+  color: #1a1a1a;
+  line-height: 1.7;
+}
+
+/* Optional overlay for readability */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 248, 230, 0.85);
+  z-index: -1;
 }
 
 /* =========================
-   TOP BAR
+   TOP BAR (MASTHEAD STYLE)
 ========================= */
 
 .top-bar {
-  background: #8b0000;
-  color: white;
-  padding: 1rem 2rem;
+  background: #111;
+  color: #f3efe6;
+  padding: 1.5rem 2rem;
+  border-bottom: 6px double #000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 4px solid #5e0000;
 }
 
 .masthead {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
 }
 
 .top-nav a {
-  color: white;
+  color: #f3efe6;
   text-decoration: none;
-  margin-left: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  margin-left: 2rem;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .top-nav a:hover {
@@ -53,37 +71,44 @@ body {
 
 .home-container {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  min-height: calc(100vh - 80px);
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 120px);
 }
 
-/* LEFT ISSUE PANEL */
+/* =========================
+   LEFT ISSUE PANEL
+========================= */
 
 .issue-left {
   padding: 3rem 2rem;
-  background: #efe8dc;
-  border-right: 4px solid #8b0000;
+  border-right: 2px solid #000;
+  background: rgba(255, 248, 230, 0.9);
 }
 
 .issue-number {
-  font-size: 5rem;
+  font-size: 6rem;
   font-weight: 900;
-  color: #8b0000;
+  border-bottom: 3px solid #000;
+  display: inline-block;
+  margin-bottom: 1rem;
 }
 
 .issue-title {
   font-size: 2rem;
-  font-weight: 800;
-  margin-top: 1rem;
   text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .issue-description {
-  margin-top: 1rem;
   font-size: 0.95rem;
+  border-top: 1px solid #000;
+  padding-top: 1rem;
 }
 
-/* RIGHT ARTICLE GRID */
+/* =========================
+   ARTICLE GRID
+========================= */
 
 .issue-articles {
   display: grid;
@@ -93,17 +118,26 @@ body {
   padding: 2rem;
 }
 
-/* ARTICLE CARDS */
+/* =========================
+   ARTICLE CARDS
+========================= */
 
 .article-standard,
 .article-wide,
 .article-tall {
-  background: white;
+  background: rgba(255,255,255,0.95);
   padding: 1rem;
-  border: 1px solid #ddd;
-  cursor: pointer;
+  border: 1px solid #000;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  transition: 0.2s ease;
+}
+
+.article-standard:hover,
+.article-wide:hover,
+.article-tall:hover {
+  background: #fffdf8;
 }
 
 .article-wide {
@@ -116,21 +150,24 @@ body {
 
 .issue-articles img {
   width: 100%;
-  height: 120px;
+  height: 130px;
   object-fit: cover;
   margin-bottom: 0.5rem;
+  filter: grayscale(40%);
 }
 
 .issue-articles h2 {
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
+  border-bottom: 1px solid #000;
+  padding-bottom: 0.3rem;
   margin-bottom: 0.5rem;
 }
 
 .meta {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 0.75rem;
+  font-style: italic;
   margin-bottom: 0.5rem;
 }
 
@@ -139,30 +176,25 @@ body {
 }
 
 /* =========================
-   ARTICLES PAGE GRID
+   ARTICLES PAGE
 ========================= */
-
-.articles-container {
-  padding: 2rem;
-}
 
 #articles-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+  padding: 2rem;
 }
 
 .article-card {
-  background: white;
+  background: rgba(255,255,255,0.95);
   padding: 1rem;
-  border: 1px solid #ddd;
-  cursor: pointer;
+  border: 1px solid #000;
 }
 
-.article-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
+.article-card h2 {
+  text-transform: uppercase;
+  border-bottom: 1px solid #000;
   margin-bottom: 0.5rem;
 }
 
@@ -171,21 +203,23 @@ body {
 ========================= */
 
 .article-page {
-  max-width: 800px;
+  max-width: 900px;
   margin: 3rem auto;
-  padding: 2rem;
-  background: white;
-  border: 1px solid #ddd;
+  padding: 3rem;
+  background: rgba(255,255,255,0.95);
+  border: 2px solid #000;
+}
+
+.article-page h1 {
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  border-bottom: 3px double #000;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .article-page img {
   width: 100%;
   margin: 1rem 0;
-}
-
-.article-page h1 {
-  font-size: 2rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
+  filter: grayscale(30%);
 }
