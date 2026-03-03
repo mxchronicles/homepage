@@ -18,15 +18,16 @@
   </nav>
 </header>
 
-<!-- CONTENT WILL LOAD HERE -->
+<!-- ARTICLE CONTENT -->
 <main id="article-container" style="padding: 2rem; max-width: 900px; margin: auto;">
   <!-- JS will insert the article here -->
 </main>
 
 <script src="articles.js" defer></script>
 <script>
-  // Call the function from articles.js to insert content
-  renderArticlePage();
+  document.addEventListener("DOMContentLoaded", () => {
+    renderArticlePage();
+  });
 </script>
 
 </body>
