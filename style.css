@@ -225,7 +225,7 @@ body::before {
 }
 
 body.home-bg {
-  background-image: url("renaissance-background.jpg");
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg/3840px-Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg");
   background-size: cover;
   background-position: center;
 }
