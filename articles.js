@@ -1,84 +1,57 @@
 // ==========================
-// SAFE DATA ACCESS
+// ARTICLES DATA ACCESS USING FIREBASE
 // ==========================
-function getArticles() {
-  return JSON.parse(localStorage.getItem("articles")) || {};
+async function getArticles() {
+  const snapshot = await db.ref("articles").get();
+  return snapshot.exists() ? snapshot.val() : {};
 }
 
-function saveArticles(articles) {
-  localStorage.setItem("articles", JSON.stringify(articles));
+async function saveArticles(articles) {
+  await db.ref("articles").set(articles);
 }
 
 // ==========================
 // ARTICLES LIST PAGE
 // ==========================
-function renderArticles() {
+async function renderArticles() {
   const grid = document.getElementById("articles-grid");
-  const searchBox = document.getElementById("search-box");
-  const filterIssue = document.getElementById("filter-issue");
+  if (!grid) return;
 
-  if (!grid || !searchBox || !filterIssue) return;
+  const articles = await getArticles();
 
-  const articles = getArticles();
+  grid.innerHTML = "";
 
-  // Populate issue filter
-  const issues = [...new Set(Object.values(articles).map(a => a.issue))].sort((a,b)=>a-b);
-  filterIssue.innerHTML =
-    `<option value="">All Issues</option>` +
-    issues.map(i => `<option value="${i}">Issue ${i}</option>`).join("");
-
-  function display() {
-    const query = searchBox.value.toLowerCase();
-    const issueFilter = filterIssue.value;
-
-    grid.innerHTML = "";
-
-    Object.entries(articles).forEach(([id, a]) => {
-      if (issueFilter && String(a.issue) !== issueFilter) return;
-
-      const text = `${a.title} ${a.author} ${a.content}`.toLowerCase();
-      if (query && !text.includes(query)) return;
-
-      const card = document.createElement("div");
-      card.className = "article-card";
-      card.onclick = () => openArticle(id);
-
-      card.innerHTML = `
-        <h2 class="article-title">${a.title.toUpperCase()}</h2>
-        <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
-        ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-        <p class="article-synopsis">${a.content.slice(0,160)}...</p>
-      `;
-
-      grid.appendChild(card);
-    });
-  }
-
-  searchBox.addEventListener("input", display);
-  filterIssue.addEventListener("change", display);
-  display();
+  Object.entries(articles).forEach(([id, a]) => {
+    const card = document.createElement("div");
+    card.className = "article-card";
+    card.onclick = () => openArticle(id);
+    card.innerHTML = `
+      <h2 class="article-title">${a.title.toUpperCase()}</h2>
+      <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
+      ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+      <p class="article-synopsis">${a.content.slice(0, 160)}...</p>
+    `;
+    grid.appendChild(card);
+  });
 }
 
 // ==========================
-// ARTICLE NAVIGATION
+// NAVIGATE TO SINGLE ARTICLE
 // ==========================
 function openArticle(id) {
-  // Pass ID via URL
-  window.location.href = `article.html?id=${encodeURIComponent(id)}`;
+  localStorage.setItem("currentArticle", id); // temporary storage for single page
+  window.location.href = "article.html";
 }
 
 // ==========================
 // SINGLE ARTICLE PAGE
 // ==========================
-function renderArticlePage() {
+async function renderArticlePage() {
   const container = document.getElementById("article-container");
   if (!container) return;
 
-  const articles = getArticles();
-
-  // Read 'id' from URL params
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+  const id = localStorage.getItem("currentArticle");
+  const articles = await getArticles();
 
   if (!id || !articles[id]) {
     container.innerHTML = "<p>Article not found.</p>";
@@ -92,7 +65,7 @@ function renderArticlePage() {
       <h1 class="article-title">${a.title.toUpperCase()}</h1>
       <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
       ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <div class="article-content">${a.content}</div>
+      <p class="article-content">${a.content}</p>
     </article>
   `;
 }
