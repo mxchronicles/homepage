@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- TOP BAR -->
   <div class="top-bar">
     <div class="masthead">MXChronicles</div>
     <div class="top-nav">
@@ -16,28 +17,20 @@
     </div>
   </div>
 
+  <!-- SEARCH & FILTER -->
+  <div style="padding:1rem 2rem; display:flex; gap:1rem; align-items:center;">
+    <input id="search-box" placeholder="Search articles..." style="flex:1; padding:0.5rem;">
+    <select id="filter-issue" style="padding:0.5rem;"></select>
+  </div>
+
+  <!-- GRID -->
   <div id="articles-grid"></div>
 
+  <script src="articles.js"></script>
   <script>
-    const articlesGrid = document.getElementById("articles-grid");
-    let articles = JSON.parse(localStorage.getItem("articles")) || [];
-
-    function renderArticles() {
-      articlesGrid.innerHTML = "";
-      articles.forEach(article => {
-        const card = document.createElement("div");
-        card.className = "article-card";
-        card.innerHTML = `
-          <h2>${article.title.toUpperCase()}</h2>
-          <p class="meta">${article.author || ""} • ${article.date || ""}</p>
-          <p>${article.synopsis || ""}</p>
-          <a href="article.html?id=${article.id}">Read More</a>
-        `;
-        articlesGrid.appendChild(card);
-      });
-    }
-
-    renderArticles();
+    document.addEventListener("DOMContentLoaded", () => {
+      renderArticles();
+    });
   </script>
 </body>
 </html>
