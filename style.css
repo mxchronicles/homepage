@@ -9,60 +9,53 @@
 }
 
 /* =========================
-   BODY (NEWSPAPER BASE)
+   BODY – VINTAGE INK BASE
 ========================= */
 
 body {
   font-family: Georgia, "Times New Roman", serif;
-  background-color: #f3efe6;
-  background-image: url("paper-texture.jpg"); /* optional texture file */
-  background-size: cover;
-  background-attachment: fixed;
-  color: #1a1a1a;
-  line-height: 1.7;
-}
-
-/* Optional overlay for readability */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 248, 230, 0.85);
-  z-index: -1;
+  background:
+    radial-gradient(circle at top left, #f4e7d0 0%, #e9dcc4 40%, #d8c7a8 100%);
+  color: #111;
+  line-height: 1.75;
 }
 
 /* =========================
-   TOP BAR (MASTHEAD STYLE)
+   TOP BAR – DRAMATIC MASTHEAD
 ========================= */
 
 .top-bar {
-  background: #111;
-  color: #f3efe6;
-  padding: 1.5rem 2rem;
-  border-bottom: 6px double #000;
+  background: linear-gradient(to bottom, #8b0000, #5e0000);
+  color: #f8f3e6;
+  padding: 1.8rem 2rem;
+  border-bottom: 6px double black;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
 }
 
 .masthead {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 900;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   text-transform: uppercase;
+  color: #fff8e7;
+  text-shadow: 2px 2px 0 black;
 }
 
 .top-nav a {
-  color: #f3efe6;
+  color: #f8f3e6;
   text-decoration: none;
   margin-left: 2rem;
   font-size: 0.9rem;
   letter-spacing: 2px;
   text-transform: uppercase;
+  font-weight: bold;
 }
 
 .top-nav a:hover {
-  text-decoration: underline;
+  color: #ffcccb;
 }
 
 /* =========================
@@ -71,39 +64,51 @@ body::before {
 
 .home-container {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 340px 1fr;
   min-height: calc(100vh - 120px);
 }
 
 /* =========================
-   LEFT ISSUE PANEL
+   LEFT PANEL – ISSUE COLUMN
 ========================= */
 
 .issue-left {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #f4e7d0,
+      #f4e7d0 4px,
+      #ead8b5 5px
+    );
   padding: 3rem 2rem;
-  border-right: 2px solid #000;
-  background: rgba(255, 248, 230, 0.9);
+  border-right: 4px solid black;
+  box-shadow: inset -6px 0 10px rgba(0,0,0,0.15);
 }
 
 .issue-number {
-  font-size: 6rem;
+  font-size: 7rem;
   font-weight: 900;
-  border-bottom: 3px solid #000;
+  color: #8b0000;
+  border-bottom: 4px solid black;
   display: inline-block;
   margin-bottom: 1rem;
+  text-shadow: 2px 2px #00000020;
 }
 
 .issue-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   text-transform: uppercase;
-  font-weight: bold;
+  font-weight: 900;
   margin-bottom: 1rem;
+  letter-spacing: 2px;
+  color: black;
 }
 
 .issue-description {
-  font-size: 0.95rem;
-  border-top: 1px solid #000;
+  font-size: 1rem;
+  border-top: 2px solid black;
   padding-top: 1rem;
+  font-style: italic;
 }
 
 /* =========================
@@ -114,8 +119,10 @@ body::before {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 260px;
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: 1.8rem;
+  padding: 2.5rem;
+  background:
+    linear-gradient(to bottom, rgba(255,248,230,0.8), rgba(255,248,230,0.9));
 }
 
 /* =========================
@@ -125,19 +132,32 @@ body::before {
 .article-standard,
 .article-wide,
 .article-tall {
-  background: rgba(255,255,255,0.95);
-  padding: 1rem;
-  border: 1px solid #000;
+  background: #fffdf7;
+  padding: 1.2rem;
+  border: 2px solid black;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: 0.2s ease;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+/* Decorative corner lines */
+.article-standard::before,
+.article-wide::before,
+.article-tall::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px dashed #8b0000;
+  pointer-events: none;
 }
 
 .article-standard:hover,
 .article-wide:hover,
 .article-tall:hover {
-  background: #fffdf8;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .article-wide {
@@ -152,50 +172,58 @@ body::before {
   width: 100%;
   height: 130px;
   object-fit: cover;
-  margin-bottom: 0.5rem;
-  filter: grayscale(40%);
+  margin-bottom: 0.7rem;
+  filter: sepia(40%) contrast(110%);
+  border: 1px solid black;
 }
 
+/* HEADLINES */
 .issue-articles h2 {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 900;
   text-transform: uppercase;
-  border-bottom: 1px solid #000;
-  padding-bottom: 0.3rem;
-  margin-bottom: 0.5rem;
+  border-bottom: 2px solid black;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: 1px;
 }
 
 .meta {
   font-size: 0.75rem;
   font-style: italic;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  color: #8b0000;
 }
 
 .issue-articles p {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 /* =========================
-   ARTICLES PAGE
+   ARTICLES PAGE GRID
 ========================= */
 
 #articles-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: 2rem;
+  padding: 3rem;
+  background: linear-gradient(to bottom, #f4e7d0, #e8d6b4);
 }
 
 .article-card {
-  background: rgba(255,255,255,0.95);
-  padding: 1rem;
-  border: 1px solid #000;
+  background: #fffdf7;
+  padding: 1.2rem;
+  border: 2px solid black;
+  position: relative;
 }
 
-.article-card h2 {
-  text-transform: uppercase;
-  border-bottom: 1px solid #000;
-  margin-bottom: 0.5rem;
+.article-card::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dotted #8b0000;
+  pointer-events: none;
 }
 
 /* =========================
@@ -206,22 +234,26 @@ body::before {
   max-width: 900px;
   margin: 3rem auto;
   padding: 3rem;
-  background: rgba(255,255,255,0.95);
-  border: 2px solid #000;
+  background: #fffdf7;
+  border: 3px double black;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
 .article-page h1 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   text-transform: uppercase;
-  border-bottom: 3px double #000;
-  padding-bottom: 0.5rem;
+  border-bottom: 4px double black;
+  padding-bottom: 0.6rem;
   margin-bottom: 1rem;
+  letter-spacing: 2px;
+  color: #8b0000;
 }
 
 .article-page img {
   width: 100%;
-  margin: 1rem 0;
-  filter: grayscale(30%);
+  margin: 1.5rem 0;
+  filter: sepia(35%);
+  border: 2px solid black;
 }
 
 body.home-bg {
