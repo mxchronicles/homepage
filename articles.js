@@ -1,5 +1,5 @@
 // ==========================
-// ARTICLES DATA ACCESS USING FIREBASE
+// FIREBASE ARTICLE MANAGEMENT
 // ==========================
 async function getArticles() {
   const snapshot = await db.ref("articles").get();
@@ -11,7 +11,7 @@ async function saveArticles(articles) {
 }
 
 // ==========================
-// ARTICLES LIST PAGE
+// ARTICLE LIST PAGE
 // ==========================
 async function renderArticles() {
   const grid = document.getElementById("articles-grid");
@@ -29,7 +29,7 @@ async function renderArticles() {
       <h2 class="article-title">${a.title.toUpperCase()}</h2>
       <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
       ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <p class="article-synopsis">${a.content.slice(0, 160)}...</p>
+      <p class="article-synopsis">${a.content.slice(0,160)}...</p>
     `;
     grid.appendChild(card);
   });
@@ -39,7 +39,7 @@ async function renderArticles() {
 // NAVIGATE TO SINGLE ARTICLE
 // ==========================
 function openArticle(id) {
-  localStorage.setItem("currentArticle", id); // temporary storage for single page
+  localStorage.setItem("currentArticle", id); // temp storage
   window.location.href = "article.html";
 }
 
