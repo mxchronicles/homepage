@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Article · MX Chronicles</title>
-<link rel="stylesheet" href="style.css">
-<script src="data.js" defer></script>
+  <meta charset="UTF-8">
+  <title>Article - MXChronicles</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="top-bar">
+    <div class="masthead">MXChronicles</div>
+    <div class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="articles.html">Articles</a>
+      <a href="about.html">About</a>
+      <a href="staff-portal.html">Staff Portal</a>
+    </div>
+  </div>
 
-<header class="top-bar">
-  <div class="masthead">MX CHRONICLES</div>
-  <nav class="top-nav">
-    <a href="index.html">HOME</a>
-    <a href="articles.html">ARTICLES</a>
-    <a href="about.html">ABOUT</a>
-    <a href="staff.html">STAFF PORTAL</a>
-  </nav>
-</header>
+  <div id="article-container"></div>
 
-<main class="article-paper" id="article"></main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    const articles = JSON.parse(localStorage.getItem("articles")) || [];
+    const article = articles.find(a => a.id === id);
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const id = Number(params.get("id"));
-const a = articles.find(x => x.id === id);
-
-document.getElementById("article").innerHTML = a ? `
-  <h1 class="article-title">${a.title}</h1>
-  <div class="article-meta">Issue ${a.issue} · ${a.author} · ${a.date}</div>
-  <img src="${a.image}" style="width:100%; margin:2rem 0;">
-  <div class="article-body">${a.content}</div>
-` : `<h2>Article not found</h2>`;
-</script>
-
+    const container = document.getElementById("article-container");
+    if(article) {
+      container.innerHTML = `
+        <div class="article-page">
+          ${article.content}
+        </div>
+      `;
+    } else {
+      container.innerHTML = `<p>Article not found.</p>`;
+    }
+  </script>
 </body>
 </html>
