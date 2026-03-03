@@ -2,38 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Article - MXChronicles</title>
+  <title>MXChronicles · Article</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="top-bar">
-    <div class="masthead">MXChronicles</div>
-    <div class="top-nav">
-      <a href="index.html">Home</a>
-      <a href="articles.html">Articles</a>
-      <a href="about.html">About</a>
-      <a href="staff-portal.html">Staff Portal</a>
-    </div>
-  </div>
 
-  <div id="article-container"></div>
+<!-- TOP NAV -->
+<header class="top-bar">
+  <div class="masthead">MXChronicles</div>
+  <nav class="top-nav">
+    <a href="index.html">Home</a>
+    <a href="articles.html">Articles</a>
+    <a href="about.html">About</a>
+    <a href="staff.html">Staff Portal</a>
+  </nav>
+</header>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get("id"));
-    const articles = JSON.parse(localStorage.getItem("articles")) || [];
-    const article = articles.find(a => a.id === id);
+<!-- CONTENT WILL LOAD HERE -->
+<main id="article-container" style="padding: 2rem; max-width: 900px; margin: auto;">
+  <!-- JS will insert the article here -->
+</main>
 
-    const container = document.getElementById("article-container");
-    if(article) {
-      container.innerHTML = `
-        <div class="article-page">
-          ${article.content}
-        </div>
-      `;
-    } else {
-      container.innerHTML = `<p>Article not found.</p>`;
-    }
-  </script>
+<script src="articles.js" defer></script>
+<script>
+  // Call the function from articles.js to insert content
+  renderArticlePage();
+</script>
+
 </body>
 </html>
