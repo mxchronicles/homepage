@@ -5,54 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MX Chronicles · Staff Portal</title>
 <link rel="stylesheet" href="style.css">
-<script src="articles.js" defer></script>
-</head>
-<body>
 
-<!-- PASSWORD OVERLAY -->
-<div id="password-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; display:flex; justify-content:center; align-items:center; z-index:999;">
-  <div style="background:#fbf8f2; padding:2rem; border:5px solid #8b0000; text-align:center; border-radius:10px; max-width:400px;">
-    <h2 style="font-family:'Merriweather', serif;">Enter Staff Portal Password</h2>
-    <input type="password" id="staff-password" placeholder="Password" style="padding:0.5rem; margin-top:1rem; width:90%;">
-    <br>
-    <button onclick="checkPassword()" style="margin-top:1rem; padding:0.5rem 1rem;">Enter</button>
-    <p id="password-error" style="color:red; margin-top:0.5rem; display:none;">Incorrect password</p>
-  </div>
-</div>
-
-<!-- STAFF PORTAL -->
-<main id="staff-portal" style="display:none; padding:2rem; max-width:1200px; margin:auto;">
-
-  <header class="top-bar">
-    <div class="masthead">MX CHRONICLES</div>
-    <nav class="top-nav">
-      <a href="index.html">HOME</a>
-      <a href="articles.html">ARTICLES</a>
-      <a href="about.html">ABOUT</a>
-      <a href="staff.html" class="active">STAFF PORTAL</a>
-    </nav>
-  </header>
-
-  <!-- STAFF MANAGEMENT -->
-  <section style="margin-bottom:3rem;">
-    <h2>Staff Members</h2>
-    <div id="staff-list" style="margin-bottom:1rem;"></div>
-    <input type="text" id="new-staff" placeholder="New staff name" style="padding:0.5rem; width:250px;">
-    <button onclick="addStaff()">Add Staff</button>
-  </section>
-
-  <!-- ARTICLE MANAGEMENT -->
-  <section>
-    <h2>Articles</h2>
-    <div class="article-grid" id="staff-articles"></div>
-  </section>
-
-</main>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
+  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
     authDomain: "mxchronicles-8e7b1.firebaseapp.com",
@@ -65,130 +24,183 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 </script>
+
+<script src="articles.js" defer></script>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div id="password-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; display:flex; justify-content:center; align-items:center; z-index:999;">
+  <div style="background:#fbf8f2; padding:2rem; border:5px solid #8b0000; text-align:center; border-radius:10px;">
+    <h2 style="font-family:'Merriweather', serif;">Enter Staff Portal Password</h2>
+    <input type="password" id="staff-password" placeholder="Password" style="padding:0.5rem; margin-top:1rem; width:80%;">
+    <br>
+    <button onclick="checkPassword()" style="margin-top:1rem; padding:0.5rem 1rem;">Enter</button>
+    <p id="password-error" style="color:red; margin-top:0.5rem; display:none;">Incorrect password</p>
+  </div>
+</div>
+
+<!-- STAFF PORTAL -->
+<main id="staff-portal" style="display:none; padding:2rem;">
+
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html">HOME</a>
+    <a href="articles.html">ARTICLES</a>
+    <a href="about.html">ABOUT</a>
+    <a href="staff.html" class="active">STAFF PORTAL</a>
+  </nav>
+</header>
+
+<!-- STAFF MANAGEMENT -->
+<section style="margin-bottom:2rem;">
+  <h2>Staff Members</h2>
+  <div id="staff-list" style="margin-bottom:1rem;"></div>
+  <input type="text" id="new-staff" placeholder="New staff name" style="padding:0.5rem;">
+  <button onclick="addStaff()">Add Staff</button>
+</section>
+
+<!-- ARTICLE MANAGEMENT -->
+<section>
+  <h2>Articles</h2>
+  <div class="article-grid" id="staff-articles"></div>
+</section>
+
+</main>
+
 <script>
-  // ---------------------------
-  // PASSWORD CHECK
-  // ---------------------------
-  function checkPassword(){
-    const pwInput = document.getElementById('staff-password').value;
-    if(pwInput === "26MXChronicles"){
-      document.getElementById('password-overlay').style.display = 'none';
-      document.getElementById('staff-portal').style.display = 'block';
-      renderStaffPortal();
-    } else {
-      document.getElementById('password-error').style.display = 'block';
-    }
+// -----------------------
+// PASSWORD CHECK
+// -----------------------
+function checkPassword(){
+  const pwInput = document.getElementById('staff-password').value;
+  if(pwInput === "26MXChronicles"){
+    document.getElementById('password-overlay').style.display = 'none';
+    document.getElementById('staff-portal').style.display = 'block';
+    renderStaffPortal();
+  } else {
+    document.getElementById('password-error').style.display = 'block';
   }
+}
 
-  // ---------------------------
-  // STAFF MANAGEMENT
-  // ---------------------------
-  function getStaff() {
-    return JSON.parse(localStorage.getItem('staff')) || [];
-  }
-  function saveStaff(staff) {
-    localStorage.setItem('staff', JSON.stringify(staff));
-  }
+// -----------------------
+// STAFF MANAGEMENT
+// -----------------------
+async function getStaff(){
+  const snapshot = await db.ref("staff").get();
+  return snapshot.exists() ? snapshot.val() : [];
+}
 
-  function renderStaffList(){
-    const staffContainer = document.getElementById('staff-list');
-    const staff = getStaff();
-    staffContainer.innerHTML = '';
-    staff.forEach((name, idx)=>{
-      const div = document.createElement('div');
-      div.className = 'staff-name';
-      div.style.marginBottom = '0.5rem';
-      div.innerHTML = `${name} <button onclick="removeStaff(${idx})">Remove</button>`;
-      staffContainer.appendChild(div);
-    });
-  }
+async function saveStaff(staff){
+  await db.ref("staff").set(staff);
+}
 
-  function addStaff(){
-    const input = document.getElementById('new-staff');
-    let staff = getStaff();
-    const name = input.value.trim();
-    if(name){
-      staff.push(name);
-      input.value = '';
-      saveStaff(staff);
-      renderStaffList();
-    }
-  }
+async function renderStaffList(){
+  const staffContainer = document.getElementById('staff-list');
+  const staff = await getStaff();
+  staffContainer.innerHTML = '';
+  staff.forEach((name, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'staff-name';
+    div.style.marginBottom = '0.5rem';
+    div.innerHTML = `${name} <button onclick="removeStaff(${idx})">Remove</button>`;
+    staffContainer.appendChild(div);
+  });
+}
 
-  function removeStaff(idx){
-    let staff = getStaff();
-    staff.splice(idx,1);
-    saveStaff(staff);
+async function addStaff(){
+  const input = document.getElementById('new-staff');
+  const name = input.value.trim();
+  if(name){
+    let staff = await getStaff();
+    staff.push(name);
+    input.value = '';
+    await saveStaff(staff);
     renderStaffList();
   }
+}
 
-  // ---------------------------
-  // ARTICLE MANAGEMENT
-  // ---------------------------
-  function renderStaffArticles(){
-    const articles = getArticles();
-    const grid = document.getElementById('staff-articles');
-    grid.innerHTML = '';
+async function removeStaff(idx){
+  let staff = await getStaff();
+  staff.splice(idx,1);
+  await saveStaff(staff);
+  renderStaffList();
+}
 
-    Object.entries(articles).forEach(([id,a])=>{
-      const div = document.createElement('div');
-      div.className = 'article-card';
-      div.innerHTML = `
-        <form onsubmit="saveArticle(event,'${id}')">
-          <h2 class="article-title">Edit: ${a.title.toUpperCase()}</h2>
-          <div class="article-meta">
-            Issue: <input type="number" name="issue" value="${a.issue}" style="width:60px;"> |
-            Author: <input type="text" name="author" value="${a.author}"> |
-            Date: <input type="date" name="date" value="${a.date}">
-          </div>
-          <input type="text" name="title" value="${a.title}" style="width:100%; margin:0.5rem 0;">
-          <textarea name="content" style="width:100%; height:150px;">${a.content}</textarea>
-          ${a.image?`<img src="${a.image}" style="width:100%; margin:0.5rem 0;">`:''}
-          <div style="margin-top:0.5rem;">
-            <button type="submit">Save</button>
-            <button type="button" onclick="deleteArticle('${id}')">Delete</button>
-            <button type="button" onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
-          </div>
-        </form>
-      `;
-      grid.appendChild(div);
-    });
-  }
+// -----------------------
+// ARTICLE MANAGEMENT
+// -----------------------
+async function renderStaffArticles(){
+  const articles = await getArticles();
+  const grid = document.getElementById('staff-articles');
+  grid.innerHTML = '';
 
-  function saveArticle(e,id){
-    e.preventDefault();
-    const form = e.target;
-    const articles = getArticles();
-    const a = articles[id];
-    a.title = form.title.value;
-    a.author = form.author.value;
-    a.date = form.date.value;
-    a.issue = form.issue.value;
-    a.content = form.content.value;
-    saveArticles(articles);
+  Object.entries(articles).forEach(([id,a])=>{
+    const div = document.createElement('div');
+    div.className = 'article-card';
+    div.innerHTML = `
+      <form onsubmit="saveArticle(event,'${id}')">
+        <h2 class="article-title">Edit: ${a.title.toUpperCase()}</h2>
+        <div class="article-meta">
+          Issue: <input type="number" name="issue" value="${a.issue}" style="width:60px;"> |
+          Author: <input type="text" name="author" value="${a.author}"> |
+          Date: <input type="date" name="date" value="${a.date}">
+        </div>
+        <input type="text" name="title" value="${a.title}" style="width:100%; margin:0.5rem 0;">
+        <textarea name="content" style="width:100%; height:100px;">${a.content}</textarea>
+        ${a.image ? `<img src="${a.image}" style="width:100%; margin:0.5rem 0;">` : ""}
+        <div style="margin-top:0.5rem;">
+          <button type="submit">Save</button>
+          <button type="button" onclick="deleteArticle('${id}')">Delete</button>
+          <button type="button" onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
+        </div>
+      </form>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+async function saveArticle(e,id){
+  e.preventDefault();
+  const form = e.target;
+  const articles = await getArticles();
+  articles[id] = {
+    title: form.title.value,
+    author: form.author.value,
+    date: form.date.value,
+    issue: form.issue.value,
+    content: form.content.value,
+    featured: articles[id].featured || false,
+    image: articles[id].image || ''
+  };
+  await saveArticles(articles);
+  renderStaffArticles();
+}
+
+async function deleteArticle(id){
+  if(confirm("Delete this article?")){
+    const articles = await getArticles();
+    delete articles[id];
+    await saveArticles(articles);
     renderStaffArticles();
   }
+}
 
-  function deleteArticle(id){
-    if(confirm("Delete this article?")){
-      const articles = getArticles();
-      delete articles[id];
-      saveArticles(articles);
-      renderStaffArticles();
-    }
-  }
+async function toggleFeature(id){
+  const articles = await getArticles();
+  articles[id].featured = !articles[id].featured;
+  await saveArticles(articles);
+  renderStaffArticles();
+}
 
-  function toggleFeature(id){
-    const articles = getArticles();
-    articles[id].featured = !articles[id].featured;
-    saveArticles(articles);
-    renderStaffArticles();
-  }
-
-  function renderStaffPortal(){
-    renderStaffList();
-    renderStaffArticles();
-  }
+// -----------------------
+// RENDER PORTAL
+// -----------------------
+async function renderStaffPortal(){
+  await renderStaffList();
+  await renderStaffArticles();
+}
 </script>
 </body>
 </html>
