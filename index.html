@@ -6,12 +6,12 @@
 <title>MX Chronicles</title>
 
 <link rel="stylesheet" href="style.css">
-<script src="data.js" defer></script>
 <script src="articles.js" defer></script>
 </head>
 
 <body onload="renderHomePage()">
 
+<!-- RED NAV BAR -->
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
   <nav class="top-nav">
@@ -22,52 +22,72 @@
   </nav>
 </header>
 
-<main class="home-layout">
+<!-- THREE REGION SPLIT -->
+<main class="home-container">
 
-  <aside class="issue-panel">
-    <div class="issue-number">ISSUE <span id="issue-number">1</span></div>
-    <div class="issue-theme" id="issue-theme">
-      A HISTORICAL EXAMINATION
-    </div>
+  <!-- LEFT PANEL -->
+  <aside class="issue-left">
+    <div class="issue-number" id="issue-number">1</div>
+    <h1 class="issue-title" id="issue-title">
+      RENAISSANCE
+    </h1>
+    <p class="issue-description" id="issue-description">
+      A reawakening of classical learning, art, and humanism across Europe.
+    </p>
   </aside>
 
-  <section class="home-articles" id="home-articles"></section>
+  <!-- RIGHT SIDE (MIDDLE + RIGHT COMBINED) -->
+  <section class="issue-articles" id="home-articles">
+  </section>
 
 </main>
 
 <script>
 function renderHomePage() {
+
   const container = document.getElementById("home-articles");
   if (!container) return;
 
   const articles = JSON.parse(localStorage.getItem("articles")) || {};
-  const issues = {};
+  container.innerHTML = "";
 
+  // Group by issue
+  const issues = {};
   Object.values(articles).forEach(a => {
     if (!issues[a.issue]) issues[a.issue] = [];
     issues[a.issue].push(a);
   });
 
   const issueNumbers = Object.keys(issues).sort((a,b)=>b-a);
-  const currentIssue = issueNumbers[0];
+  const currentIssue = issueNumbers[0] || 1;
 
-  document.getElementById("issue-number").textContent = currentIssue || "—";
+  document.getElementById("issue-number").textContent = currentIssue;
 
-  container.innerHTML = "";
+  const currentArticles = issues[currentIssue] || [];
 
-  (issues[currentIssue] || []).forEach(a => {
-    const el = document.createElement("article");
-    el.className = a.featured ? "home-article featured" : "home-article";
-    el.onclick = () => openArticle(a.id);
+  currentArticles.forEach((a, index) => {
 
-    el.innerHTML = `
+    const article = document.createElement("article");
+
+    // Irregular layout logic
+    if (index % 4 === 0) {
+      article.className = "article-wide";
+    } else if (index % 3 === 0) {
+      article.className = "article-tall";
+    } else {
+      article.className = "article-standard";
+    }
+
+    article.onclick = () => openArticle(a.id);
+
+    article.innerHTML = `
       ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <h2 class="article-title">${a.title.toUpperCase()}</h2>
-      <div class="article-meta">${a.author} · ${a.date}</div>
-      <p class="article-synopsis">${a.content.slice(0,140)}...</p>
+      <h2>${a.title.toUpperCase()}</h2>
+      <div class="meta">${a.author} · ${a.date}</div>
+      <p>${a.content.slice(0,120)}...</p>
     `;
 
-    container.appendChild(el);
+    container.appendChild(article);
   });
 }
 </script>
