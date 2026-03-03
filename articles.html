@@ -6,31 +6,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- TOP BAR -->
+
   <div class="top-bar">
     <div class="masthead">MXChronicles</div>
     <div class="top-nav">
       <a href="index.html">Home</a>
-      <a href="articles.html">Articles</a>
+      <a href="articles.html" class="active">Articles</a>
       <a href="about.html">About</a>
       <a href="staff.html">Staff Portal</a>
     </div>
   </div>
 
-  <!-- SEARCH & FILTER -->
-  <div style="padding:1rem 2rem; display:flex; gap:1rem; align-items:center;">
-    <input id="search-box" placeholder="Search articles..." style="flex:1; padding:0.5rem;">
+  <!-- Optional search/filter -->
+  <div style="padding:1rem; display:flex; gap:1rem;">
+    <input type="text" id="search-box" placeholder="Search articles..." style="flex:1; padding:0.5rem;">
     <select id="filter-issue" style="padding:0.5rem;"></select>
   </div>
 
-  <!-- GRID -->
   <div id="articles-grid"></div>
 
-  <script src="articles.js"></script>
+  <script src="articles.js" defer></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      renderArticles();
-    });
+    renderArticles();
   </script>
 </body>
 </html>
