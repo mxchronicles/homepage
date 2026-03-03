@@ -29,6 +29,23 @@
 
   <!-- ARTICLES GRID -->
   <div id="articles-grid"></div>
+  <!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
+    authDomain: "mxchronicles-8e7b1.firebaseapp.com",
+    databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
+    projectId: "mxchronicles-8e7b1",
+    storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
+    messagingSenderId: "855683773579",
+    appId: "1:855683773579:web:199aba0a59a5e09701908e"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 
   <script>
     // Render articles on page load
