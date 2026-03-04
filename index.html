@@ -78,27 +78,22 @@ function renderHomePage(){
 
       container.innerHTML = "";
 
-      currentArticles.forEach(([id, a], index)=>{
-        const article = document.createElement("article");
-        if(index % 4 === 0){
-          article.className = "article-wide";
-        } else if(index % 3 === 0){
-          article.className = "article-tall";
-        } else {
-          article.className = "article-standard";
-        }
+      currentArticles.forEach((a,index)=>{
+    const article = document.createElement("article");
 
-        // Use the correct Firebase key
-        article.onclick = ()=>openArticle(id);
+    // ✅ Apply a single uniform class
+    article.className = "article-home-tile";
 
-        article.innerHTML=`
-          ${a.image?`<img src="${a.image}" alt="${a.title}">`:""}
-          <h2>${a.title.toUpperCase()}</h2>
-          <div class="meta">${a.author} · ${a.date}</div>
-          <p>${a.content.slice(0,120)}...</p>
-        `;
-        container.appendChild(article);
-      });
+    article.onclick = ()=>openArticle(a.id);
+
+    article.innerHTML=`
+      ${a.image?`<img src="${a.image}" alt="${a.title}">`:""}
+      <h2>${a.title.toUpperCase()}</h2>
+      <div class="meta">${a.author} · ${a.date}</div>
+      <p>${a.content.slice(0,120)}...</p>
+    `;
+    container.appendChild(article);
+});
     });
   });
 }
