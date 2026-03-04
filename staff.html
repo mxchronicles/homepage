@@ -132,18 +132,20 @@ function saveIssueSettings() {
 }
 
 // STAFF MANAGEMENT
- staffRef.on("value", snapshot => {
+ // STAFF MANAGEMENT
+staffRef.on("value", snapshot => {
   const staff = snapshot.val() || [];
-  const container = document.getElementById("staff-container");
+  const container = document.getElementById("staff-list");
   container.innerHTML = "";
 
-  staff.forEach(member => {
+  staff.forEach((member, i) => {
     const div = document.createElement("div");
-    div.className = "staff-card";
+    div.className = "list-item";
 
     div.innerHTML = `
-      <h3>${member.name}</h3>
-      <p>${member.role || "Staff"}</p>
+      <strong>${member.name}</strong> - ${member.role || "Staff"}
+      <button onclick="removeStaff(${i})">Remove</button>
+      <button onclick="editRole(${i})">Edit Role</button>
     `;
 
     container.appendChild(div);
