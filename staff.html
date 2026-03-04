@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Portal</title>
+<title>MX Chronicles • Staff Portal</title>
 <link rel="stylesheet" href="style.css">
 
 <!-- Firebase -->
@@ -30,136 +30,157 @@ const staffRef = db.ref("staff");
 
 <body>
 
-<h1>Staff Portal</h1>
+<!-- PASSWORD OVERLAY -->
+<div id="password-overlay" class="overlay">
+  <div class="overlay-box">
+    <h2>Staff Portal Access</h2>
+    <input type="password" id="staff-password" placeholder="Enter Password">
+    <button onclick="checkPassword()">Enter</button>
+    <p id="password-error">Incorrect password</p>
+  </div>
+</div>
 
-<!-- ================= STAFF MANAGEMENT ================= -->
-<section>
+<div id="staff-portal" style="display:none;">
+
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+</header>
+
+<main class="container">
+
+<section class="panel">
 <h2>Staff Members</h2>
 <div id="staff-list"></div>
+<div class="row">
 <input type="text" id="new-staff" placeholder="New staff name">
-<button onclick="addStaff()">Add Staff</button>
+<button onclick="addStaff()">Add</button>
+</div>
 </section>
 
-<hr>
-
-<!-- ================= ADD ARTICLE ================= -->
-<section>
-<h2>Add Article</h2>
-<form id="new-article-form">
-<input type="text" name="title" placeholder="Title" required><br>
-<input type="text" name="author" placeholder="Author" required><br>
-<input type="date" name="date" required><br>
-<textarea name="content" placeholder="Content" required></textarea><br>
-<button type="submit">Add Article</button>
+<section class="panel">
+<h2>Add New Article</h2>
+<form id="new-article-form" class="form-grid">
+<input type="text" name="title" placeholder="Title" required>
+<input type="text" name="author" placeholder="Author" required>
+<input type="date" name="date" required>
+<textarea name="content" placeholder="Article content..." required></textarea>
+<button type="submit">Publish Article</button>
 </form>
 </section>
 
-<hr>
-
-<!-- ================= MANAGE ARTICLES ================= -->
-<section>
+<section class="panel">
 <h2>Manage Articles</h2>
-<div id="staff-articles"></div>
+<div id="staff-articles" class="article-grid"></div>
 </section>
+
+</main>
+</div>
 
 <script>
 
-// ================= STAFF =================
-function renderStaff() {
-  staffRef.on("value", snapshot => {
-    const data = snapshot.val() || [];
-    const container = document.getElementById("staff-list");
-    container.innerHTML = "";
-
-    data.forEach((name, index) => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        ${name}
-        <button onclick="removeStaff(${index})">Remove</button>
-      `;
-      container.appendChild(div);
-    });
-  });
+// PASSWORD
+function checkPassword(){
+  const pw = document.getElementById("staff-password").value;
+  if(pw === "26MXChronicles"){
+    document.getElementById("password-overlay").style.display = "none";
+    document.getElementById("staff-portal").style.display = "block";
+  } else {
+    document.getElementById("password-error").style.display = "block";
+  }
 }
 
-function addStaff() {
-  const input = document.getElementById("new-staff");
-  if (!input.value.trim()) return;
+// STAFF
+staffRef.on("value", snapshot=>{
+  const data = snapshot.val() || [];
+  const container = document.getElementById("staff-list");
+  container.innerHTML = "";
+  data.forEach((name,i)=>{
+    const div = document.createElement("div");
+    div.className = "list-item";
+    div.innerHTML = `
+      ${name}
+      <button onclick="removeStaff(${i})">Remove</button>
+    `;
+    container.appendChild(div);
+  });
+});
 
-  staffRef.once("value").then(snapshot => {
+function addStaff(){
+  const input = document.getElementById("new-staff");
+  if(!input.value.trim()) return;
+
+  staffRef.once("value").then(snapshot=>{
     let staff = snapshot.val() || [];
     staff.push(input.value.trim());
     staffRef.set(staff);
-    input.value = "";
+    input.value="";
   });
 }
 
-function removeStaff(index) {
-  staffRef.once("value").then(snapshot => {
+function removeStaff(index){
+  staffRef.once("value").then(snapshot=>{
     let staff = snapshot.val() || [];
-    staff.splice(index, 1);
+    staff.splice(index,1);
     staffRef.set(staff);
   });
 }
 
-// ================= ADD ARTICLE =================
+// ADD ARTICLE
 document.getElementById("new-article-form").addEventListener("submit", function(e){
   e.preventDefault();
-
   const form = e.target;
-  const newArticleRef = articlesRef.push();
-
-  newArticleRef.set({
+  articlesRef.push({
     title: form.title.value,
     author: form.author.value,
     date: form.date.value,
-    content: form.content.value
+    content: form.content.value,
+    featured:false
   });
-
   form.reset();
 });
 
-// ================= MANAGE ARTICLES =================
-function renderArticles() {
-  articlesRef.on("value", snapshot => {
-    const data = snapshot.val();
-    const container = document.getElementById("staff-articles");
-    container.innerHTML = "";
+// MANAGE ARTICLES
+articlesRef.on("value", snapshot=>{
+  const data = snapshot.val();
+  const container = document.getElementById("staff-articles");
+  container.innerHTML="";
 
-    if (!data) {
-      container.innerHTML = "<p>No articles yet.</p>";
-      return;
-    }
+  if(!data){
+    container.innerHTML="<p>No articles yet.</p>";
+    return;
+  }
 
-    Object.entries(data).forEach(([id, article]) => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <strong>${article.title}</strong>
-        <button onclick="deleteArticle('${id}')">Delete</button>
-        <button onclick="editArticle('${id}')">Edit</button>
-        <hr>
-      `;
-      container.appendChild(div);
-    });
+  Object.entries(data).forEach(([id,a])=>{
+    const card=document.createElement("div");
+    card.className="article-card";
+    card.innerHTML=`
+      <h3>${a.title}</h3>
+      <p>${a.author} • ${a.date}</p>
+      <button onclick="editArticle('${id}')">Edit</button>
+      <button onclick="deleteArticle('${id}')">Delete</button>
+      <button onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
+    `;
+    container.appendChild(card);
   });
-}
+});
 
-function deleteArticle(id) {
+function deleteArticle(id){
   articlesRef.child(id).remove();
 }
 
-function editArticle(id) {
-  const newTitle = prompt("New title:");
-  if (!newTitle) return;
-
-  articlesRef.child(id).update({
-    title: newTitle
-  });
+function editArticle(id){
+  const newContent = prompt("Edit content:");
+  if(newContent){
+    articlesRef.child(id).update({content:newContent});
+  }
 }
 
-// ================= INIT =================
-renderStaff();
-renderArticles();
+function toggleFeature(id){
+  articlesRef.child(id).once("value").then(snap=>{
+    const current = snap.val().featured || false;
+    articlesRef.child(id).update({featured:!current});
+  });
+}
 
 </script>
 </body>
