@@ -11,49 +11,43 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
-    authDomain: "mxchronicles-8e7b1.firebaseapp.com",
-    databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
-    projectId: "mxchronicles-8e7b1",
-    storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
-    messagingSenderId: "855683773579",
-    appId: "1:855683773579:web:199aba0a59a5e09701908e"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+const firebaseConfig = {
+  apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
+  authDomain: "mxchronicles-8e7b1.firebaseapp.com",
+  databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
+  projectId: "mxchronicles-8e7b1",
+  storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
+  messagingSenderId: "855683773579",
+  appId: "1:855683773579:web:199aba0a59a5e09701908e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 </script>
 
 <script src="articles.js" defer></script>
+
 </head>
 <body>
 
 <!-- PASSWORD OVERLAY -->
-<div id="password-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; display:flex; justify-content:center; align-items:center; z-index:999;">
-  <div style="background:#fbf8f2; padding:2rem; border:5px solid #8b0000; text-align:center; border-radius:10px;">
-    <h2 style="font-family:'Merriweather', serif;">Enter Staff Portal Password</h2>
-    <input type="password" id="staff-password" placeholder="Password" style="padding:0.5rem; margin-top:1rem; width:80%;">
+<div id="password-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000a;display:flex;justify-content:center;align-items:center;z-index:999;">
+  <div style="background:#fbf8f2;padding:2rem;border:5px solid #8b0000;text-align:center;border-radius:10px;">
+    <h2>Enter Staff Portal Password</h2>
+    <input type="password" id="staff-password" placeholder="Password" style="padding:0.5rem;width:80%;">
     <br>
-    <button onclick="checkPassword()" style="margin-top:1rem; padding:0.5rem 1rem;">Enter</button>
-    <p id="password-error" style="color:red; margin-top:0.5rem; display:none;">Incorrect password</p>
+    <button onclick="checkPassword()" style="margin-top:1rem;padding:0.5rem 1rem;">Enter</button>
+    <p id="password-error" style="color:red;display:none;margin-top:0.5rem;">Incorrect password</p>
   </div>
 </div>
 
-<!-- STAFF PORTAL -->
-<main id="staff-portal" style="display:none; padding:2rem;">
+<main id="staff-portal" style="display:none;padding:2rem;">
 
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
-  <nav class="top-nav">
-    <a href="index.html">HOME</a>
-    <a href="articles.html">ARTICLES</a>
-    <a href="about.html">ABOUT</a>
-    <a href="staff.html" class="active">STAFF PORTAL</a>
-  </nav>
 </header>
 
-<!-- STAFF MANAGEMENT -->
+<!-- ================= STAFF MANAGEMENT ================= -->
 <section style="margin-bottom:2rem;">
   <h2>Staff Members</h2>
   <div id="staff-list" style="margin-bottom:1rem;"></div>
@@ -61,21 +55,38 @@
   <button onclick="addStaff()">Add Staff</button>
 </section>
 
-<!-- ARTICLE MANAGEMENT -->
+<hr style="margin:2rem 0;">
+
+<!-- ================= ADD NEW ARTICLE ================= -->
+<section style="margin-bottom:2rem;">
+  <h2>Add New Article</h2>
+  <form id="new-article-form">
+    <input type="text" name="title" placeholder="Title" required style="width:100%;margin-bottom:0.5rem;">
+    <input type="text" name="author" placeholder="Author" required style="width:100%;margin-bottom:0.5rem;">
+    <input type="date" name="date" required style="margin-bottom:0.5rem;">
+    <input type="number" name="issue" placeholder="Issue #" required style="width:100px;margin-bottom:0.5rem;">
+    <textarea name="content" placeholder="Content" required style="width:100%;height:120px;margin-bottom:0.5rem;"></textarea>
+    <input type="text" name="image" placeholder="Image URL (optional)" style="width:100%;margin-bottom:0.5rem;">
+    <button type="submit">Add Article</button>
+  </form>
+</section>
+
+<hr style="margin:2rem 0;">
+
+<!-- ================= EDIT ARTICLES ================= -->
 <section>
-  <h2>Articles</h2>
+  <h2>Edit Existing Articles</h2>
   <div class="article-grid" id="staff-articles"></div>
 </section>
 
 </main>
 
 <script>
-// -----------------------
-// PASSWORD CHECK
-// -----------------------
+
+// ================= PASSWORD =================
 function checkPassword(){
-  const pwInput = document.getElementById('staff-password').value;
-  if(pwInput === "26MXChronicles"){
+  const pw = document.getElementById('staff-password').value;
+  if(pw === "26MXChronicles"){
     document.getElementById('password-overlay').style.display = 'none';
     document.getElementById('staff-portal').style.display = 'block';
     renderStaffPortal();
@@ -84,12 +95,10 @@ function checkPassword(){
   }
 }
 
-// -----------------------
-// STAFF MANAGEMENT
-// -----------------------
+// ================= STAFF =================
 async function getStaff(){
-  const snapshot = await db.ref("staff").get();
-  return snapshot.exists() ? snapshot.val() : [];
+  const snap = await db.ref("staff").get();
+  return snap.exists() ? snap.val() : [];
 }
 
 async function saveStaff(staff){
@@ -97,40 +106,35 @@ async function saveStaff(staff){
 }
 
 async function renderStaffList(){
-  const staffContainer = document.getElementById('staff-list');
   const staff = await getStaff();
-  staffContainer.innerHTML = '';
-  staff.forEach((name, idx)=>{
+  const container = document.getElementById('staff-list');
+  container.innerHTML = '';
+  staff.forEach((name,i)=>{
     const div = document.createElement('div');
-    div.className = 'staff-name';
-    div.style.marginBottom = '0.5rem';
-    div.innerHTML = `${name} <button onclick="removeStaff(${idx})">Remove</button>`;
-    staffContainer.appendChild(div);
+    div.innerHTML = `${name} <button onclick="removeStaff(${i})">Remove</button>`;
+    container.appendChild(div);
   });
 }
 
 async function addStaff(){
   const input = document.getElementById('new-staff');
-  const name = input.value.trim();
-  if(name){
+  if(input.value.trim()){
     let staff = await getStaff();
-    staff.push(name);
-    input.value = '';
+    staff.push(input.value.trim());
     await saveStaff(staff);
+    input.value = '';
     renderStaffList();
   }
 }
 
-async function removeStaff(idx){
+async function removeStaff(i){
   let staff = await getStaff();
-  staff.splice(idx,1);
+  staff.splice(i,1);
   await saveStaff(staff);
   renderStaffList();
 }
 
-// -----------------------
-// ARTICLE MANAGEMENT
-// -----------------------
+// ================= ARTICLES =================
 async function renderStaffArticles(){
   const articles = await getArticles();
   const grid = document.getElementById('staff-articles');
@@ -141,21 +145,18 @@ async function renderStaffArticles(){
     div.className = 'article-card';
     div.innerHTML = `
       <form onsubmit="saveArticle(event,'${id}')">
-        <h2 class="article-title">Edit: ${a.title.toUpperCase()}</h2>
-        <div class="article-meta">
-          Issue: <input type="number" name="issue" value="${a.issue}" style="width:60px;"> |
-          Author: <input type="text" name="author" value="${a.author}"> |
-          Date: <input type="date" name="date" value="${a.date}">
-        </div>
-        <input type="text" name="title" value="${a.title}" style="width:100%; margin:0.5rem 0;">
-        <textarea name="content" style="width:100%; height:100px;">${a.content}</textarea>
-        ${a.image ? `<img src="${a.image}" style="width:100%; margin:0.5rem 0;">` : ""}
-        <div style="margin-top:0.5rem;">
-          <button type="submit">Save</button>
-          <button type="button" onclick="deleteArticle('${id}')">Delete</button>
-          <button type="button" onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
-        </div>
+        <h3>Edit: ${a.title}</h3>
+        <input type="text" name="title" value="${a.title}" style="width:100%;margin-bottom:0.3rem;">
+        <input type="text" name="author" value="${a.author}" style="width:100%;margin-bottom:0.3rem;">
+        <input type="date" name="date" value="${a.date}" style="margin-bottom:0.3rem;">
+        <input type="number" name="issue" value="${a.issue}" style="width:80px;margin-bottom:0.3rem;">
+        <textarea name="content" style="width:100%;height:100px;margin-bottom:0.3rem;">${a.content}</textarea>
+        <input type="text" name="image" value="${a.image || ''}" style="width:100%;margin-bottom:0.3rem;">
+        <button type="submit">Save</button>
+        <button type="button" onclick="deleteArticle('${id}')">Delete</button>
+        <button type="button" onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
       </form>
+      <hr>
     `;
     grid.appendChild(div);
   });
@@ -171,8 +172,8 @@ async function saveArticle(e,id){
     date: form.date.value,
     issue: form.issue.value,
     content: form.content.value,
-    featured: articles[id].featured || false,
-    image: articles[id].image || ''
+    image: form.image.value || '',
+    featured: articles[id].featured || false
   };
   await saveArticles(articles);
   renderStaffArticles();
@@ -194,13 +195,34 @@ async function toggleFeature(id){
   renderStaffArticles();
 }
 
-// -----------------------
-// RENDER PORTAL
-// -----------------------
+// ================= ADD NEW ARTICLE =================
+document.getElementById('new-article-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const form = e.target;
+  const articles = await getArticles();
+  const id = Date.now().toString();
+
+  articles[id] = {
+    title: form.title.value,
+    author: form.author.value,
+    date: form.date.value,
+    issue: form.issue.value,
+    content: form.content.value,
+    image: form.image.value || '',
+    featured: false
+  };
+
+  await saveArticles(articles);
+  form.reset();
+  renderStaffArticles();
+});
+
+// ================= INIT =================
 async function renderStaffPortal(){
   await renderStaffList();
   await renderStaffArticles();
 }
+
 </script>
 </body>
 </html>
