@@ -385,59 +385,52 @@ button:hover {
   border-bottom: 1px solid #ccc;
 }
 
-/* --------------------------- */
-/* HOME PAGE TILES             */
-/* --------------------------- */
+/* HOMEPAGE ARTICLE TILE */
 .article-home-tile {
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  background: #fff;
+  border-radius: 8px;
   overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  margin: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   cursor: pointer;
-  background-color: #fff;
-  transition: transform 0.2s, box-shadow 0.2s;
-  width: 100%;
-  max-width: 320px;
+  transition: transform 0.2s;
+  margin-bottom: 1.5rem;
 }
 
+.article-home-tile:hover {
+  transform: translateY(-4px);
+}
+
+/* IMAGE AT TOP */
 .article-home-tile img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  height: 180px; /* fixed height */
+  object-fit: cover; /* keep aspect ratio, fill the box */
+  display: block; /* remove default inline spacing */
+}
+
+/* TEXT BELOW IMAGE */
+.article-home-tile h2,
+.article-home-tile .meta,
+.article-home-tile p {
+  margin: 0.5rem 1rem; /* spacing inside the tile */
 }
 
 .article-home-tile h2 {
   font-size: 1.1rem;
-  font-weight: bold;
-  margin: 0.5rem 0 0.2rem 0;
-  color: #222;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .article-home-tile .meta {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #555;
-  margin-bottom: 0.3rem;
 }
 
 .article-home-tile p {
   font-size: 0.9rem;
+  line-height: 1.4;
   color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.article-home-tile:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-}
-
-.issue-articles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  margin-bottom: 1rem;
 }
