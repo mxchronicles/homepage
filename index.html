@@ -71,20 +71,25 @@ function renderHomePage(){
     // Load articles for this issue
     articlesRef.once("value").then(snap=>{
       const articles = snap.val() || {};
-      const currentArticles = Object.values(articles).filter(a => a.issue == issueNum);
+
+      // ✅ Use Object.entries to preserve Firebase keys
+      const currentArticles = Object.entries(articles)
+        .filter(([id, a]) => a.issue == issueNum);
+
       container.innerHTML = "";
 
-      currentArticles.forEach((a,index)=>{
+      currentArticles.forEach(([id, a], index)=>{
         const article = document.createElement("article");
-        if(index%4===0){
-          article.className="article-wide";
-        } else if(index%3===0){
-          article.className="article-tall";
+        if(index % 4 === 0){
+          article.className = "article-wide";
+        } else if(index % 3 === 0){
+          article.className = "article-tall";
         } else {
-          article.className="article-standard";
+          article.className = "article-standard";
         }
 
-        article.onclick = ()=>openArticle(a.id);
+        // Use the correct Firebase key
+        article.onclick = ()=>openArticle(id);
 
         article.innerHTML=`
           ${a.image?`<img src="${a.image}" alt="${a.title}">`:""}
