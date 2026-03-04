@@ -1,57 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Articles - MXChronicles</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <script src="articles.js" defer></script>
-</head>
-<body>
-  <!-- TOP NAV -->
-  <div class="top-bar">
-    <div class="masthead">MXChronicles</div>
-    <div class="top-nav">
-      <a href="index.html">Home</a>
-      <a href="articles.html" class="active">Articles</a>
-      <a href="about.html">About</a>
-      <a href="staff.html">Staff Portal</a>
-    </div>
-  </div>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MX Chronicles · Articles</title>
+<link rel="stylesheet" href="style.css">
 
-  <!-- SEARCH & FILTER -->
-  <div style="padding:2rem;">
-    <input id="search-box" type="text" placeholder="Search articles..." style="padding:0.5rem; width:45%; margin-right:1rem;">
-    <select id="filter-issue" style="padding:0.5rem;">
-      <option value="">All Issues</option>
-    </select>
-  </div>
-
-  <!-- ARTICLES GRID -->
-  <div id="articles-grid"></div>
-  <!-- Firebase -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html">HOME</a>
+    <a href="articles.html" class="active">ARTICLES</a>
+    <a href="about.html">ABOUT</a>
+    <a href="staff.html">STAFF PORTAL</a>
+  </nav>
+</header>
+
+<main id="articles-grid" class="issue-articles" style="padding:2rem;"></main>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
-    authDomain: "mxchronicles-8e7b1.firebaseapp.com",
-    databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
-    projectId: "mxchronicles-8e7b1",
-    storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
-    messagingSenderId: "855683773579",
-    appId: "1:855683773579:web:199aba0a59a5e09701908e"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
+  authDomain: "mxchronicles-8e7b1.firebaseapp.com",
+  databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
+  projectId: "mxchronicles-8e7b1",
+  storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
+  messagingSenderId: "855683773579",
+  appId: "1:855683773579:web:199aba0a59a5e09701908e"
+};
 
-  <script>
-    // Render articles on page load
-    document.addEventListener("DOMContentLoaded", () => {
-      renderArticles();
-    });
-  </script>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const articlesRef = db.ref("articles");
+
+const grid = document.getElementById("articles-grid");
+
+function renderArticles(data) {
+  grid.innerHTML = "";
+  if (!data) {
+    grid.innerHTML = "<p>No articles yet.</p>";
+    return;
+  }
+
+  Object.entries(data).forEach(([id,a],index) => {
+    const card = document.createElement("article");
+
+    // Irregular sizing for variety
+    if(index % 4 === 0) card.className = "article-wide";
+    else if(index % 3 === 0) card.className = "article-tall";
+    else card.className = "article-standard";
+
+    card.onclick = () => {
+      localStorage.setItem("currentArticle", id);
+      window.location.href = "article.html";
+    };
+
+    card.innerHTML = `
+      ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+      <h2>${a.title.toUpperCase()}</h2>
+      <div class="meta">${a.author} · ${a.date} · Issue ${a.issue || "N/A"}</div>
+      <p>${a.content.slice(0,160)}...</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Realtime updates
+articlesRef.on("value", snapshot => {
+  renderArticles(snapshot.val());
+});
+</script>
 </body>
 </html>
