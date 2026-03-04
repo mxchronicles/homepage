@@ -3,27 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MX Chronicles · Article</title>
+<title>MXChronicles · Article</title>
 <link rel="stylesheet" href="style.css">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
-
-<body>
-
-<header class="top-bar">
-  <div class="masthead">MX CHRONICLES</div>
-  <nav class="top-nav">
-    <a href="index.html">HOME</a>
-    <a href="articles.html">ARTICLES</a>
-    <a href="about.html">ABOUT</a>
-    <a href="staff.html">STAFF PORTAL</a>
-  </nav>
-</header>
-
-<main id="article-container" style="padding:2rem; max-width:900px; margin:auto;"></main>
 
 <script>
 const firebaseConfig = {
@@ -35,35 +20,61 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const articlesRef = db.ref("articles");
+</script>
+</head>
 
-const container = document.getElementById("article-container");
-const articleId = localStorage.getItem("currentArticle");
+<body class="body-article">
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html">HOME</a>
+    <a href="articles.html">ARTICLES</a>
+    <a href="about.html">ABOUT</a>
+    <a href="staff.html">STAFF PORTAL</a>
+  </nav>
+</header>
 
-if(!articleId){
-  container.innerHTML = "<p>Article not found.</p>";
-} else {
-  articlesRef.child(articleId).once("value").then(snap => {
-    const a = snap.val();
-    if(!a){
+<main id="article-container" class="article-page-container">
+  <!-- Article content will be injected here -->
+</main>
+
+<script>
+function renderArticlePage() {
+  const container = document.getElementById("article-container");
+
+  // Get article id from URL
+  const params = new URLSearchParams(window.location.search);
+  const articleId = params.get("id") || localStorage.getItem("currentArticle");
+
+  if (!articleId) {
+    container.innerHTML = "<p>Article not found.</p>";
+    return;
+  }
+
+  articlesRef.child(articleId).once("value").then(snapshot => {
+    const a = snapshot.val();
+    if (!a) {
       container.innerHTML = "<p>Article not found.</p>";
       return;
     }
 
+    // Use vintage/newspaper style layout
     container.innerHTML = `
       <article class="article-page">
-        <h1>${a.title.toUpperCase()}</h1>
-        <div class="meta">${a.author} · ${a.date} · Issue ${a.issue || "N/A"}</div>
+        <h1 class="article-title">${a.title.toUpperCase()}</h1>
+        <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue || '1'}</div>
         ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-        <p>${a.content.replace(/\n/g,"<br>")}</p>
+        <p class="article-content" style="white-space: pre-line;">${a.content}</p>
       </article>
     `;
   });
 }
-</script>
 
+// Call render
+renderArticlePage();
+</script>
 </body>
 </html>
