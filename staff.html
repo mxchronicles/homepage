@@ -135,20 +135,24 @@ function saveIssueSettings() {
  // STAFF MANAGEMENT
 staffRef.on("value", snapshot => {
   const staff = snapshot.val() || [];
-  const container = document.getElementById("staff-list");
+  const container = document.getElementById("staff-container");
   container.innerHTML = "";
 
-  staff.forEach((member, i) => {
-    const div = document.createElement("div");
-    div.className = "list-item";
+  if (staff.length === 0) {
+    container.innerHTML = "<p>No staff members listed yet.</p>";
+    return;
+  }
 
-    div.innerHTML = `
-      <strong>${member.name}</strong> - ${member.role || "Staff"}
-      <button onclick="removeStaff(${i})">Remove</button>
-      <button onclick="editRole(${i})">Edit Role</button>
+  staff.forEach(member => {
+    const card = document.createElement("div");
+    card.className = "staff-card";
+
+    card.innerHTML = `
+      <h3>${member.name}</h3>
+      <p>${member.role || "Staff"}</p>
     `;
 
-    container.appendChild(div);
+    container.appendChild(card);
   });
 });
 
