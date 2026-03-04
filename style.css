@@ -222,21 +222,35 @@ body.home-bg {
   color: #8b0000;
 }
 
-/* ARTICLE PAGE IMAGE FIX */
-.article-page img {
-    display: block;       /* removes inline spacing */
-    margin: 0;            /* removes default margins */
-    padding: 0;           /* removes default padding */
-    width: 100%;          /* optional: scale to container width */
-    height: auto;         /* maintain aspect ratio */
+/* Single Article Page */
+.article-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
-.article-page h1,
+.article-page img {
+    display: block;   /* ensures no inline gap */
+    margin: 0;        /* remove default margin */
+    padding: 0;       /* remove default padding */
+    width: 100%;
+    height: auto;
+}
+
+.article-page h1.article-title,
 .article-page .article-meta,
 .article-page .article-content {
-    margin-top: 0.5rem;   /* small spacing after image */
+    margin: 0;        /* remove top/bottom margins */
+    padding: 0;       /* remove any default padding */
 }
 
+.article-page .article-meta {
+    margin-bottom: 1rem; /* optional small spacing between meta and content */
+}
+
+.article-page .article-content {
+    margin-top: 0;   /* ensures content sticks right under meta */
+}
 /* =========================
    ARTICLES PAGE GRID
 ========================= */
