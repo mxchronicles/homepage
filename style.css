@@ -230,26 +230,27 @@ body.home-bg {
 }
 
 .article-page img {
-    display: block;   /* ensures no inline gap */
-    margin: 0;        /* remove default margin */
-    padding: 0;       /* remove default padding */
+    display: block;   /* removes inline gap */
     width: 100%;
     height: auto;
+    margin: 0;        /* no top/bottom margin */
+    padding: 0;
 }
 
 .article-page h1.article-title,
 .article-page .article-meta,
 .article-page .article-content {
-    margin: 0;        /* remove top/bottom margins */
-    padding: 0;       /* remove any default padding */
+    margin: 0;        /* removes default spacing from headings and paragraphs */
+    padding: 0;
 }
 
+/* Optional: controlled spacing */
 .article-page .article-meta {
-    margin-bottom: 1rem; /* optional small spacing between meta and content */
+    margin-top: 0.5rem;  /* small space between title and meta */
+    margin-bottom: 0.5rem; /* space before content */
 }
-
 .article-page .article-content {
-    margin-top: 0;   /* ensures content sticks right under meta */
+    margin-top: 0;   /* sticks directly under meta */
 }
 /* =========================
    ARTICLES PAGE GRID
