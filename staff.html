@@ -131,63 +131,62 @@ function saveIssueSettings() {
 }
 
 // STAFF MANAGEMENT
-staffRef.on("value", snapshot => {
-  const staff = snapshot.val() || [];
-  const container = document.getElementById("staff-list");
-  container.innerHTML = "";
+ staffRef.on("value", snapshot => {
+    const staff = snapshot.val() || [];
+    const container = document.getElementById("staff-list");
+    container.innerHTML = "";
 
-  staff.forEach((member, i) => {
-    // member is now an object {name, role}
-    const div = document.createElement("div");
-    div.className = "list-item";
-    div.innerHTML = `
-      <strong>${member.name}</strong> - ${member.role || "Staff"}
-      <button onclick="removeStaff(${i})">Remove</button>
-      <button onclick="editRole(${i})">Edit Role</button>
-    `;
-    container.appendChild(div);
+    staff.forEach((member, i) => {
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.innerHTML = `
+        <strong>${member.name}</strong> - ${member.role || "Staff"}
+        <button onclick="removeStaff(${i})">Remove</button>
+        <button onclick="editRole(${i})">Edit Role</button>
+      `;
+      container.appendChild(div);
+    });
   });
-});
 
-// ADD STAFF (with role)
-function addStaff() {
-  const nameInput = document.getElementById("new-staff");
-  const roleInput = document.getElementById("new-staff-role"); // new input field
-  const name = nameInput.value.trim();
-  const role = roleInput.value.trim() || "Staff";
+  // ADD STAFF (with optional role)
+  function addStaff() {
+    const nameInput = document.getElementById("new-staff");
+    const roleInput = document.getElementById("new-staff-role");
+    const name = nameInput.value.trim();
+    const role = roleInput.value.trim() || "Staff";
 
-  if (!name) return;
+    if (!name) return;
 
-  staffRef.once("value").then(snapshot => {
-    let staff = snapshot.val() || [];
-    staff.push({ name, role }); // store as object
-    staffRef.set(staff);
-    nameInput.value = "";
-    roleInput.value = "";
-  });
-}
-
-// REMOVE STAFF
-function removeStaff(index) {
-  staffRef.once("value").then(snapshot => {
-    let staff = snapshot.val() || [];
-    staff.splice(index, 1);
-    staffRef.set(staff);
-  });
-}
-
-// EDIT ROLE
-function editRole(index) {
-  staffRef.once("value").then(snapshot => {
-    let staff = snapshot.val() || [];
-    const newRole = prompt("Edit role:", staff[index].role || "Staff");
-    if (newRole !== null) {
-      staff[index].role = newRole;
+    staffRef.once("value").then(snapshot => {
+      let staff = snapshot.val() || [];
+      staff.push({ name, role });
       staffRef.set(staff);
-    }
-  });
-}
+      nameInput.value = "";
+      roleInput.value = "";
+    });
+  }
 
+  // REMOVE STAFF
+  function removeStaff(index) {
+    staffRef.once("value").then(snapshot => {
+      let staff = snapshot.val() || [];
+      staff.splice(index, 1);
+      staffRef.set(staff);
+    });
+  }
+
+  // EDIT ROLE
+  function editRole(index) {
+    staffRef.once("value").then(snapshot => {
+      let staff = snapshot.val() || [];
+      const newRole = prompt("Edit role:", staff[index].role || "Staff");
+      if (newRole !== null) {
+        staff[index].role = newRole;
+        staffRef.set(staff);
+      }
+    });
+  }
+  
 // ADD NEW ARTICLE
 document.getElementById("new-article-form").addEventListener("submit", function(e){
   e.preventDefault();
