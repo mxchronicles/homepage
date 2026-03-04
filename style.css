@@ -222,34 +222,58 @@ body.home-bg {
   color: #8b0000;
 }
 
-/* Single Article Page - No Gap Between Image and Text */
+/* =========================
+   Single Article Page
+   ========================= */
 .article-page {
     max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    font-family: 'Merriweather', serif;
+    color: #1a1a1a;
+    line-height: 1.6;
 }
 
-.article-page img {
-    display: block;        /* remove inline spacing */
-    width: 100%;
-    height: auto;
-    margin: 0;             /* remove browser default margins */
-    padding: 0;
-    vertical-align: top;   /* remove any inline alignment gap */
-}
-
-.article-page .article-title {
-    margin: 1rem 0 0 0;    /* space below title only */
+.article-page h1.article-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
 }
 
 .article-page .article-meta {
-    margin: 0.25rem 0;     /* small spacing between title and content */
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1rem;
 }
 
-.article-page .article-content {
-    margin: 0;             /* no top margin to touch the image directly */
+/* IMAGE STYLING - No gap above or below, full width */
+.article-page img {
+    display: block;        /* removes inline gap */
+    width: 100%;           /* scales to container */
+    height: auto;
+    margin: 0;             /* removes default spacing */
     padding: 0;
-    line-height: 1.5;      /* consistent text spacing */
+    vertical-align: top;   /* eliminates inline alignment gap */
+}
+
+/* ARTICLE CONTENT */
+.article-page .article-content {
+    display: block;
+    margin-top: 0;         /* touches image */
+    padding: 0;
+    font-size: 1rem;
+    color: #222;
+}
+
+/* Optional: spacing between paragraphs inside content */
+.article-page .article-content p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+/* Ensures no extra space from parent container */
+.article-page * {
+    box-sizing: border-box;
 }
 /* =========================
    ARTICLES PAGE GRID
