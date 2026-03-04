@@ -1,71 +1,78 @@
 // ==========================
-// FIREBASE ARTICLE MANAGEMENT
+// FIREBASE REFERENCES
 // ==========================
-async function getArticles() {
-  const snapshot = await db.ref("articles").get();
-  return snapshot.exists() ? snapshot.val() : {};
-}
-
-async function saveArticles(articles) {
-  await db.ref("articles").set(articles);
-}
+const db = firebase.database();
+const articlesRef = db.ref("articles");
 
 // ==========================
-// ARTICLE LIST PAGE
+// ARTICLES LIST PAGE
 // ==========================
-async function renderArticles() {
+function renderArticles() {
   const grid = document.getElementById("articles-grid");
   if (!grid) return;
 
-  const articles = await getArticles();
+  articlesRef.on("value", snapshot => {
+    const data = snapshot.val();
+    grid.innerHTML = "";
 
-  grid.innerHTML = "";
+    if (!data) {
+      grid.innerHTML = "<p>No articles yet.</p>";
+      return;
+    }
 
-  Object.entries(articles).forEach(([id, a]) => {
-    const card = document.createElement("div");
-    card.className = "article-card";
-    card.onclick = () => openArticle(id);
-    card.innerHTML = `
-      <h2 class="article-title">${a.title.toUpperCase()}</h2>
-      <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
-      ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <p class="article-synopsis">${a.content.slice(0,160)}...</p>
-    `;
-    grid.appendChild(card);
+    Object.entries(data).forEach(([id, a]) => {
+      const card = document.createElement("div");
+      card.className = "article-card";
+      card.innerHTML = `
+        <h2>${a.title}</h2>
+        <p>${a.author || ""} • ${a.date || ""}</p>
+        <p>${a.content ? a.content.substring(0,150) + "..." : ""}</p>
+        <a href="article.html?id=${id}">Read More</a>
+      `;
+      grid.appendChild(card);
+    });
   });
-}
-
-// ==========================
-// NAVIGATE TO SINGLE ARTICLE
-// ==========================
-function openArticle(id) {
-  localStorage.setItem("currentArticle", id); // temp storage
-  window.location.href = "article.html";
 }
 
 // ==========================
 // SINGLE ARTICLE PAGE
 // ==========================
-async function renderArticlePage() {
+function renderArticlePage() {
   const container = document.getElementById("article-container");
   if (!container) return;
 
-  const id = localStorage.getItem("currentArticle");
-  const articles = await getArticles();
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-  if (!id || !articles[id]) {
+  if (!id) {
     container.innerHTML = "<p>Article not found.</p>";
     return;
   }
 
-  const a = articles[id];
+  articlesRef.child(id).once("value").then(snapshot => {
+    const a = snapshot.val();
 
-  container.innerHTML = `
-    <article class="article-page">
-      <h1 class="article-title">${a.title.toUpperCase()}</h1>
-      <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
-      ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <p class="article-content">${a.content}</p>
-    </article>
-  `;
+    if (!a) {
+      container.innerHTML = "<p>Article not found.</p>";
+      return;
+    }
+
+    container.innerHTML = `
+      <article>
+        <h1>${a.title}</h1>
+        <p>${a.author || ""} • ${a.date || ""}</p>
+        <div>${a.content || ""}</div>
+      </article>
+    `;
+  });
 }
+
+// Run correct function automatically
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("articles-grid")) {
+    renderArticles();
+  }
+  if (document.getElementById("article-container")) {
+    renderArticlePage();
+  }
+});
