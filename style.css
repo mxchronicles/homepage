@@ -227,7 +227,7 @@ body.home-bg {
   display: flex;
   flex-direction: column;
   background: #fff;
-  padding: 1rem 1rem 2rem; /* reduce top padding to remove extra space */
+  padding: 0 1rem 2rem; /* remove top padding entirely */
   max-width: 900px;
   margin: 2rem auto;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -235,28 +235,28 @@ body.home-bg {
 
 .article-page img {
   width: 100%;
-  height: auto;       /* natural scaling */
-  object-fit: cover;  /* maintain aspect ratio */
-  margin: 0;          /* remove default top/bottom margin */
+  height: auto;
+  object-fit: cover;
+  margin: 0;       /* remove top/bottom margin */
   display: block;
 }
 
 .article-page h1 {
   font-size: 2rem;
-  margin: 0.75rem 0 0.5rem 0; /* minimal margin above and below */
+  margin: 0.5rem 0 0.25rem 0; /* very small top margin to sit close to image */
 }
 
 .article-page .article-meta {
   font-size: 0.85rem;
   color: #555;
-  margin-bottom: 0.75rem; /* slightly less to reduce blank space */
+  margin: 0 0 0.5rem 0; /* remove top margin, keep small bottom margin */
 }
 
 .article-page .article-content {
   font-size: 1rem;
   line-height: 1.6;
   color: #333;
-  margin-top: 0; /* remove extra space above text */
+  margin: 0; /* remove top margin completely */
 }
 
 /* =========================
