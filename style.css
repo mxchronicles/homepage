@@ -366,8 +366,7 @@ button:hover {
   height: 120px;
 }
 
-/* Make homepage article tiles match image size */
-.article-wide, .article-tall, .article-standard {
+.article-home-tile {
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -378,12 +377,10 @@ button:hover {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.article-wide img, 
-.article-tall img, 
-.article-standard img {
+.article-home-tile img {
   width: 100%;
   height: auto;       /* keeps aspect ratio */
-  object-fit: cover;  /* fill container nicely */
-  border-bottom: 1px solid #ccc;
+  object-fit: cover;  /* fills container nicely */
   display: block;
+  border-bottom: 1px solid #ccc;
 }
