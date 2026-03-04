@@ -222,41 +222,19 @@ body.home-bg {
   color: #8b0000;
 }
 
-/* SINGLE ARTICLE PAGE */
-.article-page {
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  padding: 0 1rem 2rem; /* remove top padding entirely */
-  max-width: 900px;
-  margin: 2rem auto;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
+/* ARTICLE PAGE IMAGE FIX */
 .article-page img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  margin: 0;       /* remove top/bottom margin */
-  display: block;
+    display: block;       /* removes inline spacing */
+    margin: 0;            /* removes default margins */
+    padding: 0;           /* removes default padding */
+    width: 100%;          /* optional: scale to container width */
+    height: auto;         /* maintain aspect ratio */
 }
 
-.article-page h1 {
-  font-size: 2rem;
-  margin: 0.5rem 0 0.25rem 0; /* very small top margin to sit close to image */
-}
-
-.article-page .article-meta {
-  font-size: 0.85rem;
-  color: #555;
-  margin: 0 0 0.5rem 0; /* remove top margin, keep small bottom margin */
-}
-
+.article-page h1,
+.article-page .article-meta,
 .article-page .article-content {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #333;
-  margin: 0; /* remove top margin completely */
+    margin-top: 0.5rem;   /* small spacing after image */
 }
 
 /* =========================
