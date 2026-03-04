@@ -222,7 +222,7 @@ body.home-bg {
   color: #8b0000;
 }
 
-/* Single Article Page */
+/* Single Article Page - No Gap Between Image and Text */
 .article-page {
     max-width: 900px;
     margin: 0 auto;
@@ -230,27 +230,26 @@ body.home-bg {
 }
 
 .article-page img {
-    display: block;   /* removes inline gap */
+    display: block;        /* remove inline spacing */
     width: 100%;
     height: auto;
-    margin: 0;        /* no top/bottom margin */
+    margin: 0;             /* remove browser default margins */
     padding: 0;
+    vertical-align: top;   /* remove any inline alignment gap */
 }
 
-.article-page h1.article-title,
-.article-page .article-meta,
-.article-page .article-content {
-    margin: 0;        /* removes default spacing from headings and paragraphs */
-    padding: 0;
+.article-page .article-title {
+    margin: 1rem 0 0 0;    /* space below title only */
 }
 
-/* Optional: controlled spacing */
 .article-page .article-meta {
-    margin-top: 0.5rem;  /* small space between title and meta */
-    margin-bottom: 0.5rem; /* space before content */
+    margin: 0.25rem 0;     /* small spacing between title and content */
 }
+
 .article-page .article-content {
-    margin-top: 0;   /* sticks directly under meta */
+    margin: 0;             /* no top margin to touch the image directly */
+    padding: 0;
+    line-height: 1.5;      /* consistent text spacing */
 }
 /* =========================
    ARTICLES PAGE GRID
