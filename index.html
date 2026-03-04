@@ -5,42 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MX Chronicles</title>
 <link rel="stylesheet" href="style.css">
+<script src="articles.js" defer></script>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
-
-<body class="home-bg">
-
-<!-- RED NAV BAR -->
-<header class="top-bar">
-  <div class="masthead">MX CHRONICLES</div>
-  <nav class="top-nav">
-    <a href="index.html" class="active">HOME</a>
-    <a href="articles.html">ARTICLES</a>
-    <a href="about.html">ABOUT</a>
-    <a href="staff.html">STAFF PORTAL</a>
-  </nav>
-</header>
-
-<!-- THREE REGION SPLIT -->
-<main class="home-container">
-
-  <!-- LEFT PANEL -->
-  <aside class="issue-left">
-    <div class="issue-number" id="issue-number">1</div>
-    <h1 class="issue-title" id="issue-title">RESURGENCE</h1>
-    <p class="issue-description" id="issue-description">
-      This issue focuses on reviving historical perspectives and highlighting the most influential events.
-    </p>
-  </aside>
-
-  <!-- RIGHT SIDE (articles grid) -->
-  <section class="issue-articles" id="home-articles">
-  </section>
-
-</main>
 
 <script>
 const firebaseConfig = {
@@ -52,58 +21,90 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const articlesRef = db.ref("articles");
+const currentIssueRef = db.ref("currentIssue");
+</script>
+</head>
 
-function renderHomePage(articlesData) {
+<body class="home-bg">
+
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html" class="active">HOME</a>
+    <a href="articles.html">ARTICLES</a>
+    <a href="about.html">ABOUT</a>
+    <a href="staff.html">STAFF PORTAL</a>
+  </nav>
+</header>
+
+<main class="home-container">
+  <!-- LEFT PANEL -->
+  <aside class="issue-left">
+    <div class="issue-number" id="issue-number">1</div>
+    <h1 class="issue-title" id="issue-title">RESURGENCE</h1>
+    <p class="issue-description" id="issue-description">This issue focuses on...</p>
+  </aside>
+
+  <!-- RIGHT SIDE (ARTICLE GRID) -->
+  <section class="issue-articles" id="home-articles"></section>
+</main>
+
+<script>
+function renderHomePage(){
   const container = document.getElementById("home-articles");
-  if (!container) return;
+  if(!container) return;
 
-  container.innerHTML = "";
+  // Get current issue info
+  currentIssueRef.on("value", snapshot=>{
+    const data = snapshot.val() || {};
+    const issueNum = data.number || 1;
+    const issueTitle = data.title || "";
+    const issueDesc = data.description || "";
 
-  const articles = articlesData || {};
-  const issues = {};
-  Object.values(articles).forEach(a => {
-    if (!issues[a.issue]) issues[a.issue] = [];
-    issues[a.issue].push(a);
-  });
+    document.getElementById("issue-number").textContent = issueNum;
+    document.getElementById("issue-title").textContent = issueTitle;
+    document.getElementById("issue-description").textContent = issueDesc;
 
-  // Sort issues descending
-  const issueNumbers = Object.keys(issues).sort((a,b)=>b-a);
-  const currentIssue = issueNumbers[0] || 1;
-  document.getElementById("issue-number").textContent = currentIssue;
+    // Load articles for this issue
+    articlesRef.once("value").then(snap=>{
+      const articles = snap.val() || {};
+      const currentArticles = Object.values(articles).filter(a => a.issue == issueNum);
+      container.innerHTML = "";
 
-  const currentArticles = issues[currentIssue] || [];
+      currentArticles.forEach((a,index)=>{
+        const article = document.createElement("article");
+        if(index%4===0){
+          article.className="article-wide";
+        } else if(index%3===0){
+          article.className="article-tall";
+        } else {
+          article.className="article-standard";
+        }
 
-  currentArticles.forEach((a,index) => {
-    const article = document.createElement("article");
+        article.onclick = ()=>openArticle(a.id);
 
-    // Maintain original layout logic
-    if(index % 4 === 0) article.className = "article-wide";
-    else if(index % 3 === 0) article.className = "article-tall";
-    else article.className = "article-standard";
-
-    article.onclick = () => {
-      localStorage.setItem("currentArticle", a.id);
-      window.location.href = "article.html";
-    };
-
-    article.innerHTML = `
-      ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-      <h2>${a.title.toUpperCase()}</h2>
-      <div class="meta">${a.author} · ${a.date}</div>
-      <p>${a.content.slice(0,120)}...</p>
-    `;
-    container.appendChild(article);
+        article.innerHTML=`
+          ${a.image?`<img src="${a.image}" alt="${a.title}">`:""}
+          <h2>${a.title.toUpperCase()}</h2>
+          <div class="meta">${a.author} · ${a.date}</div>
+          <p>${a.content.slice(0,120)}...</p>
+        `;
+        container.appendChild(article);
+      });
+    });
   });
 }
 
-// Firebase listener updates homepage in real-time
-articlesRef.on("value", snapshot => {
-  renderHomePage(snapshot.val());
-});
+// Redirect to article page
+function openArticle(id){
+  localStorage.setItem("currentArticle", id);
+  window.location.href="article.html";
+}
+
+renderHomePage();
 </script>
 
 </body>
