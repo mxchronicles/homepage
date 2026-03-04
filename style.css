@@ -14,10 +14,15 @@
 
 body {
   font-family: Georgia, "Times New Roman", serif;
-  background:
-    radial-gradient(circle at top left, #f4e7d0 0%, #e9dcc4 40%, #d8c7a8 100%);
+  background: radial-gradient(circle at top left, #f4e7d0 0%, #e9dcc4 40%, #d8c7a8 100%);
   color: #111;
   line-height: 1.75;
+}
+
+body.home-bg {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg/3840px-Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 /* =========================
@@ -52,6 +57,11 @@ body {
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: bold;
+}
+
+.top-nav a.active {
+  text-decoration: underline;
+  color: #ffcccb;
 }
 
 .top-nav a:hover {
@@ -109,10 +119,11 @@ body {
   border-top: 2px solid black;
   padding-top: 1rem;
   font-style: italic;
+  line-height: 1.5;
 }
 
 /* =========================
-   ARTICLE GRID
+   ARTICLE GRID – HOMEPAGE
 ========================= */
 
 .issue-articles {
@@ -131,7 +142,8 @@ body {
 
 .article-standard,
 .article-wide,
-.article-tall {
+.article-tall,
+.article-card {
   background: #fffdf7;
   padding: 1.2rem;
   border: 2px solid black;
@@ -142,10 +154,10 @@ body {
   position: relative;
 }
 
-/* Decorative corner lines */
 .article-standard::before,
 .article-wide::before,
-.article-tall::before {
+.article-tall::before,
+.article-card::before {
   content: "";
   position: absolute;
   inset: 6px;
@@ -155,7 +167,8 @@ body {
 
 .article-standard:hover,
 .article-wide:hover,
-.article-tall:hover {
+.article-tall:hover,
+.article-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
@@ -168,9 +181,10 @@ body {
   grid-row: span 2;
 }
 
-.issue-articles img {
+.issue-articles img,
+.article-card img,
+.article-page img {
   width: 100%;
-  height: 130px;
   object-fit: cover;
   margin-bottom: 0.7rem;
   filter: sepia(40%) contrast(110%);
@@ -178,7 +192,10 @@ body {
 }
 
 /* HEADLINES */
-.issue-articles h2 {
+.issue-articles h2,
+.article-card h2,
+.article-card h3,
+.article-page h1 {
   font-size: 1.1rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -188,15 +205,38 @@ body {
   letter-spacing: 1px;
 }
 
-.meta {
+.article-page h1 {
+  font-size: 2.8rem;
+  border-bottom: 4px double black;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+  color: #8b0000;
+}
+
+/* META INFO */
+.meta,
+.article-meta {
   font-size: 0.75rem;
   font-style: italic;
   margin-bottom: 0.6rem;
   color: #8b0000;
 }
 
-.issue-articles p {
-  font-size: 0.9rem;
+/* ARTICLE PAGE CONTENT */
+.article-page {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 3rem;
+  background: #fffdf7;
+  border: 3px double black;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.article-page p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 1rem;
+  white-space: pre-line;
 }
 
 /* =========================
@@ -211,53 +251,117 @@ body {
   background: linear-gradient(to bottom, #f4e7d0, #e8d6b4);
 }
 
-.article-card {
-  background: #fffdf7;
-  padding: 1.2rem;
-  border: 2px solid black;
-  position: relative;
+/* =========================
+   STAFF PORTAL
+========================= */
+
+#staff-portal {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.article-card::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border: 1px dotted #8b0000;
-  pointer-events: none;
+.panel {
+  background: #fffdf7;
+  border: 2px solid black;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.panel h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #8b0000;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid black;
+  padding-bottom: 0.4rem;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-bottom: 1px dashed #8b0000;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+input, textarea {
+  font-family: Georgia, "Times New Roman", serif;
+  padding: 0.5rem;
+  border: 2px solid black;
+  border-radius: 2px;
+}
+
+button {
+  background: #8b0000;
+  color: #fff8e7;
+  border: 2px solid black;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  background: #5e0000;
 }
 
 /* =========================
-   SINGLE ARTICLE PAGE
+   PASSWORD OVERLAY
 ========================= */
 
-.article-page {
-  max-width: 900px;
-  margin: 3rem auto;
-  padding: 3rem;
-  background: #fffdf7;
-  border: 3px double black;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+.overlay {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
-.article-page h1 {
-  font-size: 2.8rem;
-  text-transform: uppercase;
-  border-bottom: 4px double black;
-  padding-bottom: 0.6rem;
+.overlay-box {
+  background: #fbf8f2;
+  padding: 2rem;
+  border: 5px solid #8b0000;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.overlay-box h2 {
+  font-family: 'Merriweather', serif;
   margin-bottom: 1rem;
-  letter-spacing: 2px;
-  color: #8b0000;
 }
 
-.article-page img {
-  width: 100%;
-  margin: 1.5rem 0;
-  filter: sepia(35%);
-  border: 2px solid black;
+.overlay-box input {
+  width: 80%;
+  margin-top: 1rem;
 }
 
-body.home-bg {
-  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg/3840px-Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg");
-  background-size: cover;
-  background-position: center;
+#password-error {
+  color: red;
+  margin-top: 0.5rem;
+  display: none;
+}
+
+/* =========================
+   FORM GRID FOR ADD ARTICLE
+========================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-grid textarea {
+  grid-column: span 2;
+  height: 120px;
 }
