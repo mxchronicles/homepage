@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MX Chronicles</title>
-
 <link rel="stylesheet" href="style.css">
-<script src="articles.js" defer></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 
-<body onload="renderHomePage()" class="home-bg">
+<body class="home-bg">
 
 <!-- RED NAV BAR -->
 <header class="top-bar">
@@ -28,23 +30,17 @@
   <!-- LEFT PANEL -->
   <aside class="issue-left">
     <div class="issue-number" id="issue-number">1</div>
-    <h1 class="issue-title" id="issue-title">
-      RESURGENCE
-    </h1>
+    <h1 class="issue-title" id="issue-title">RESURGENCE</h1>
     <p class="issue-description" id="issue-description">
-      This issue focuses on...
+      This issue focuses on reviving historical perspectives and highlighting the most influential events.
     </p>
   </aside>
 
-  <!-- RIGHT SIDE -->
+  <!-- RIGHT SIDE (articles grid) -->
   <section class="issue-articles" id="home-articles">
   </section>
 
 </main>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -59,74 +55,55 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-</script>
+const articlesRef = db.ref("articles");
 
-<script>
-function renderHomePage() {
-
+function renderHomePage(articlesData) {
   const container = document.getElementById("home-articles");
   if (!container) return;
 
-  db.ref("articles").once("value").then(snapshot => {
+  container.innerHTML = "";
 
-    const articlesData = snapshot.val();
-    if (!articlesData) {
-      container.innerHTML = "<p>No articles yet.</p>";
-      return;
-    }
+  const articles = articlesData || {};
+  const issues = {};
+  Object.values(articles).forEach(a => {
+    if (!issues[a.issue]) issues[a.issue] = [];
+    issues[a.issue].push(a);
+  });
 
-    container.innerHTML = "";
+  // Sort issues descending
+  const issueNumbers = Object.keys(issues).sort((a,b)=>b-a);
+  const currentIssue = issueNumbers[0] || 1;
+  document.getElementById("issue-number").textContent = currentIssue;
 
-    // Convert Firebase object → array
-    const articles = Object.entries(articlesData).map(([id, data]) => ({
-      id,
-      ...data
-    }));
+  const currentArticles = issues[currentIssue] || [];
 
-    // Group by issue
-    const issues = {};
-    articles.forEach(a => {
-      const issueNum = a.issue || 1;
-      if (!issues[issueNum]) issues[issueNum] = [];
-      issues[issueNum].push(a);
-    });
+  currentArticles.forEach((a,index) => {
+    const article = document.createElement("article");
 
-    const issueNumbers = Object.keys(issues).sort((a,b)=>b-a);
-    const currentIssue = issueNumbers[0] || 1;
+    // Maintain original layout logic
+    if(index % 4 === 0) article.className = "article-wide";
+    else if(index % 3 === 0) article.className = "article-tall";
+    else article.className = "article-standard";
 
-    document.getElementById("issue-number").textContent = currentIssue;
+    article.onclick = () => {
+      localStorage.setItem("currentArticle", a.id);
+      window.location.href = "article.html";
+    };
 
-    const currentArticles = issues[currentIssue] || [];
-
-    currentArticles.forEach((a, index) => {
-
-      const article = document.createElement("article");
-
-      // Your irregular layout logic preserved
-      if (index % 4 === 0) {
-        article.className = "article-wide";
-      } else if (index % 3 === 0) {
-        article.className = "article-tall";
-      } else {
-        article.className = "article-standard";
-      }
-
-      article.onclick = () => {
-        window.location.href = `article.html?id=${a.id}`;
-      };
-
-      article.innerHTML = `
-        ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-        <h2>${a.title.toUpperCase()}</h2>
-        <div class="meta">${a.author} · ${a.date}</div>
-        <p>${a.content ? a.content.slice(0,120) : ""}...</p>
-      `;
-
-      container.appendChild(article);
-    });
-
+    article.innerHTML = `
+      ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+      <h2>${a.title.toUpperCase()}</h2>
+      <div class="meta">${a.author} · ${a.date}</div>
+      <p>${a.content.slice(0,120)}...</p>
+    `;
+    container.appendChild(article);
   });
 }
+
+// Firebase listener updates homepage in real-time
+articlesRef.on("value", snapshot => {
+  renderHomePage(snapshot.val());
+});
 </script>
 
 </body>
