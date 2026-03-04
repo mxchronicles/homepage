@@ -390,8 +390,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
+  overflow: visible; /* ensure text isn't clipped */
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   cursor: pointer;
   transition: transform 0.2s;
@@ -405,16 +404,16 @@ button:hover {
 /* IMAGE AT TOP */
 .article-home-tile img {
   width: 100%;
-  height: 180px; /* fixed height */
-  object-fit: cover; /* keep aspect ratio, fill the box */
-  display: block; /* remove default inline spacing */
+  height: auto; /* remove fixed height */
+  object-fit: cover; /* scales the image nicely */
+  display: block;
 }
 
 /* TEXT BELOW IMAGE */
 .article-home-tile h2,
 .article-home-tile .meta,
 .article-home-tile p {
-  margin: 0.5rem 1rem; /* spacing inside the tile */
+  margin: 0.5rem 1rem;
 }
 
 .article-home-tile h2 {
@@ -433,4 +432,9 @@ button:hover {
   line-height: 1.4;
   color: #333;
   margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* show up to 4 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
