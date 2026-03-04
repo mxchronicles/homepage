@@ -20,11 +20,11 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const articlesRef = db.ref("articles");
 const staffRef = db.ref("staff");
+const currentIssueRef = db.ref("currentIssue");
 </script>
 </head>
 
@@ -44,40 +44,65 @@ const staffRef = db.ref("staff");
 
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html">HOME</a>
+    <a href="articles.html">ARTICLES</a>
+    <a href="about.html">ABOUT</a>
+    <a href="staff.html" class="active">STAFF PORTAL</a>
+  </nav>
 </header>
 
 <main class="container">
 
+<!-- ISSUE SETTINGS -->
 <section class="panel">
-<h2>Staff Members</h2>
-<div id="staff-list"></div>
-<div class="row">
-<input type="text" id="new-staff" placeholder="New staff name">
-<button onclick="addStaff()">Add</button>
-</div>
+  <h2>Issue Settings</h2>
+  <div class="row">
+    <input type="number" id="issue-number-input" placeholder="Issue Number">
+  </div>
+  <div class="row">
+    <input type="text" id="issue-title-input" placeholder="Issue Title">
+  </div>
+  <div class="row">
+    <textarea id="issue-description-input" placeholder="Issue Description"></textarea>
+  </div>
+  <button onclick="saveIssueSettings()">Save Issue Settings</button>
 </section>
 
+<!-- STAFF MANAGEMENT -->
 <section class="panel">
-<h2>Add New Article</h2>
-<form id="new-article-form" class="form-grid">
-<input type="text" name="title" placeholder="Title" required>
-<input type="text" name="author" placeholder="Author" required>
-<input type="date" name="date" required>
-<textarea name="content" placeholder="Article content..." required></textarea>
-<button type="submit">Publish Article</button>
-</form>
+  <h2>Staff Members</h2>
+  <div id="staff-list"></div>
+  <div class="row">
+    <input type="text" id="new-staff" placeholder="New staff name">
+    <button onclick="addStaff()">Add</button>
+  </div>
 </section>
 
+<!-- ADD NEW ARTICLE -->
 <section class="panel">
-<h2>Manage Articles</h2>
-<div id="staff-articles" class="article-grid"></div>
+  <h2>Add New Article</h2>
+  <form id="new-article-form" class="form-grid">
+    <input type="text" name="title" placeholder="Title" required>
+    <input type="text" name="author" placeholder="Author" required>
+    <input type="date" name="date" required>
+    <input type="number" name="issue" placeholder="Issue Number" required>
+    <input type="text" name="image" placeholder="Image URL">
+    <textarea name="content" placeholder="Article content..." required></textarea>
+    <button type="submit">Publish Article</button>
+  </form>
+</section>
+
+<!-- MANAGE ARTICLES -->
+<section class="panel">
+  <h2>Manage Articles</h2>
+  <div id="staff-articles" class="article-grid"></div>
 </section>
 
 </main>
 </div>
 
 <script>
-
 // PASSWORD
 function checkPassword(){
   const pw = document.getElementById("staff-password").value;
@@ -89,7 +114,23 @@ function checkPassword(){
   }
 }
 
-// STAFF
+// ISSUE SETTINGS
+currentIssueRef.on("value", snapshot => {
+  const data = snapshot.val() || {};
+  document.getElementById("issue-number-input").value = data.number || "";
+  document.getElementById("issue-title-input").value = data.title || "";
+  document.getElementById("issue-description-input").value = data.description || "";
+});
+
+function saveIssueSettings() {
+  const number = parseInt(document.getElementById("issue-number-input").value);
+  const title = document.getElementById("issue-title-input").value.trim();
+  const description = document.getElementById("issue-description-input").value.trim();
+  currentIssueRef.set({number, title, description});
+  alert("Issue settings saved!");
+}
+
+// STAFF MANAGEMENT
 staffRef.on("value", snapshot=>{
   const data = snapshot.val() || [];
   const container = document.getElementById("staff-list");
@@ -98,7 +139,7 @@ staffRef.on("value", snapshot=>{
     const div = document.createElement("div");
     div.className = "list-item";
     div.innerHTML = `
-      ${name}
+      ${name} 
       <button onclick="removeStaff(${i})">Remove</button>
     `;
     container.appendChild(div);
@@ -108,7 +149,6 @@ staffRef.on("value", snapshot=>{
 function addStaff(){
   const input = document.getElementById("new-staff");
   if(!input.value.trim()) return;
-
   staffRef.once("value").then(snapshot=>{
     let staff = snapshot.val() || [];
     staff.push(input.value.trim());
@@ -125,7 +165,7 @@ function removeStaff(index){
   });
 }
 
-// ADD ARTICLE
+// ADD NEW ARTICLE
 document.getElementById("new-article-form").addEventListener("submit", function(e){
   e.preventDefault();
   const form = e.target;
@@ -133,7 +173,9 @@ document.getElementById("new-article-form").addEventListener("submit", function(
     title: form.title.value,
     author: form.author.value,
     date: form.date.value,
+    issue: parseInt(form.issue.value),
     content: form.content.value,
+    image: form.image.value || "",
     featured:false
   });
   form.reset();
@@ -144,18 +186,16 @@ articlesRef.on("value", snapshot=>{
   const data = snapshot.val();
   const container = document.getElementById("staff-articles");
   container.innerHTML="";
-
   if(!data){
     container.innerHTML="<p>No articles yet.</p>";
     return;
   }
-
   Object.entries(data).forEach(([id,a])=>{
     const card=document.createElement("div");
     card.className="article-card";
     card.innerHTML=`
       <h3>${a.title}</h3>
-      <p>${a.author} • ${a.date}</p>
+      <p>${a.author} • ${a.date} • Issue ${a.issue}</p>
       <button onclick="editArticle('${id}')">Edit</button>
       <button onclick="deleteArticle('${id}')">Delete</button>
       <button onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
@@ -181,7 +221,7 @@ function toggleFeature(id){
     articlesRef.child(id).update({featured:!current});
   });
 }
-
 </script>
+
 </body>
 </html>
