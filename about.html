@@ -3,57 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MX Chronicles · About</title>
+<title>About Us</title>
 <link rel="stylesheet" href="style.css">
-<script src="data.js" defer></script>
-<script src="about.js" defer></script>
-</head>
-<body onload="renderAbout()">
 
-<!-- TOP BAR -->
-<header class="top-bar">
-  <div class="masthead">MX CHRONICLES</div>
-  <nav class="top-nav">
-    <a href="index.html">HOME</a>
-    <a href="articles.html">ARTICLES</a>
-    <a href="about.html" class="active">ABOUT</a>
-    <a href="staff.html">STAFF PORTAL</a>
-  </nav>
-</header>
-
-<main style="padding:2rem; max-width:1200px; margin:auto;">
-
-  <!-- About Section -->
-  <section style="margin-bottom:3rem;">
-    <h1 class="article-title">ABOUT MX CHRONICLES</h1>
-    <p style="font-family: 'Roboto', sans-serif; font-size:1rem; line-height:1.6;">
-      The Middlesex Chronicles is a student-run historical magazine of Middlesex School dedicated to examining the past with rigor and curiosity. 
-    Each issue explores a defining theme in world history through researched articles and visual features crafted by student writers,
-      editors, and developers.
-    </p>
-  </section>
-
-  <!-- Staff Section -->
-  <section>
-    <h2 class="article-title">STAFF</h2>
-    <div id="staff-grid" class="article-grid"></div>
-  </section>
-
-</main>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// Render About Page
-function renderAbout(){
-  const staffContainer = document.getElementById('staff-grid');
-  staffContainer.innerHTML = '';
-  staff.forEach((name)=>{
-    const div = document.createElement('div');
-    div.className = 'article-card';
-    div.style.textAlign = 'center';
-    div.innerHTML = `<h3 class="article-title">${name}</h3>`;
-    staffContainer.appendChild(div);
+const firebaseConfig = {
+  apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
+  authDomain: "mxchronicles-8e7b1.firebaseapp.com",
+  databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
+  projectId: "mxchronicles-8e7b1",
+  storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
+  messagingSenderId: "855683773579",
+  appId: "1:855683773579:web:199aba0a59a5e09701908e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const staffRef = db.ref("staff");
+</script>
+</head>
+
+<body>
+
+<h1>About MX Chronicles</h1>
+
+<h2>Our Staff</h2>
+<ul id="staff-list"></ul>
+
+<script>
+staffRef.on("value", snapshot => {
+  const data = snapshot.val() || [];
+  const list = document.getElementById("staff-list");
+  list.innerHTML = "";
+
+  data.forEach(name => {
+    const li = document.createElement("li");
+    li.textContent = name;
+    list.appendChild(li);
   });
-}
+});
 </script>
 
 </body>
