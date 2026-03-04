@@ -53,12 +53,12 @@ const currentIssueRef = db.ref("currentIssue");
 </main>
 
 <script>
-function renderHomePage(){
+function renderHomePage() {
   const container = document.getElementById("home-articles");
-  if(!container) return;
+  if (!container) return;
 
   // Get current issue info
-  currentIssueRef.on("value", snapshot=>{
+  currentIssueRef.on("value", snapshot => {
     const data = snapshot.val() || {};
     const issueNum = data.number || 1;
     const issueTitle = data.title || "";
@@ -69,39 +69,41 @@ function renderHomePage(){
     document.getElementById("issue-description").textContent = issueDesc;
 
     // Load articles for this issue
-    articlesRef.once("value").then(snap=>{
+    articlesRef.once("value").then(snap => {
       const articles = snap.val() || {};
 
-      // ✅ Use Object.entries to preserve Firebase keys
+      // ✅ Map Firebase keys to `id` so openArticle() works
       const currentArticles = Object.entries(articles)
-        .filter(([id, a]) => a.issue == issueNum);
+        .map(([key, value]) => ({ id: key, ...value }))
+        .filter(a => a.issue == issueNum);
 
       container.innerHTML = "";
 
-      currentArticles.forEach((a,index)=>{
-    const article = document.createElement("article");
+      currentArticles.forEach((a, index) => {
+        const article = document.createElement("article");
 
-    // ✅ Apply a single uniform class
-    article.className = "article-home-tile";
+        // Match image to tile size
+        article.className = "article-home-tile";
 
-    article.onclick = ()=>openArticle(a.id);
+        // Open correct article page
+        article.onclick = () => openArticle(a.id);
 
-    article.innerHTML=`
-      ${a.image?`<img src="${a.image}" alt="${a.title}">`:""}
-      <h2>${a.title.toUpperCase()}</h2>
-      <div class="meta">${a.author} · ${a.date}</div>
-      <p>${a.content.slice(0,120)}...</p>
-    `;
-    container.appendChild(article);
+        article.innerHTML = `
+          ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+          <h2>${a.title.toUpperCase()}</h2>
+          <div class="meta">${a.author} · ${a.date}</div>
+          <p>${a.content.slice(0,120)}...</p>
+        `;
+        container.appendChild(article);
       });
     });
   });
 }
 
 // Redirect to article page
-function openArticle(id){
+function openArticle(id) {
   localStorage.setItem("currentArticle", id);
-  window.location.href="article.html";
+  window.location.href = "article.html";
 }
 
 renderHomePage();
