@@ -1,52 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MXChronicles · Article</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <script src="articles.js" defer></script>
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MX Chronicles · Article</title>
+<link rel="stylesheet" href="style.css">
 
-  <!-- TOP NAV -->
-  <header class="top-bar">
-    <div class="masthead">MXChronicles</div>
-    <nav class="top-nav">
-      <a href="index.html">Home</a>
-      <a href="articles.html">Articles</a>
-      <a href="about.html">About</a>
-      <a href="staff.html">Staff Portal</a>
-    </nav>
-  </header>
-
-  <!-- CONTENT WILL LOAD HERE -->
-  <main id="article-container" style="padding: 2rem; max-width: 900px; margin: auto;">
-    <!-- JS will insert the article here -->
-  </main>
-  <!-- Firebase -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html">HOME</a>
+    <a href="articles.html">ARTICLES</a>
+    <a href="about.html">ABOUT</a>
+    <a href="staff.html">STAFF PORTAL</a>
+  </nav>
+</header>
+
+<main id="article-container" style="padding:2rem; max-width:900px; margin:auto;"></main>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
-    authDomain: "mxchronicles-8e7b1.firebaseapp.com",
-    databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
-    projectId: "mxchronicles-8e7b1",
-    storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
-    messagingSenderId: "855683773579",
-    appId: "1:855683773579:web:199aba0a59a5e09701908e"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+const firebaseConfig = {
+  apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
+  authDomain: "mxchronicles-8e7b1.firebaseapp.com",
+  databaseURL: "https://mxchronicles-8e7b1-default-rtdb.firebaseio.com",
+  projectId: "mxchronicles-8e7b1",
+  storageBucket: "mxchronicles-8e7b1.firebasestorage.app",
+  messagingSenderId: "855683773579",
+  appId: "1:855683773579:web:199aba0a59a5e09701908e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const articlesRef = db.ref("articles");
+
+const container = document.getElementById("article-container");
+const articleId = localStorage.getItem("currentArticle");
+
+if(!articleId){
+  container.innerHTML = "<p>Article not found.</p>";
+} else {
+  articlesRef.child(articleId).once("value").then(snap => {
+    const a = snap.val();
+    if(!a){
+      container.innerHTML = "<p>Article not found.</p>";
+      return;
+    }
+
+    container.innerHTML = `
+      <article class="article-page">
+        <h1>${a.title.toUpperCase()}</h1>
+        <div class="meta">${a.author} · ${a.date} · Issue ${a.issue || "N/A"}</div>
+        ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+        <p>${a.content.replace(/\n/g,"<br>")}</p>
+      </article>
+    `;
+  });
+}
 </script>
-  <script>
-    // Render article based on URL parameter
-    document.addEventListener("DOMContentLoaded", () => {
-      renderArticlePage();
-    });
-  </script>
 
 </body>
 </html>
