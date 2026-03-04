@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About Us</title>
+<title>MX Chronicles • About</title>
 <link rel="stylesheet" href="style.css">
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -29,20 +28,30 @@ const staffRef = db.ref("staff");
 
 <body>
 
-<h1>About MX Chronicles</h1>
+<header class="top-bar">
+  <div class="masthead">MX CHRONICLES</div>
+</header>
 
+<main class="container">
+<section class="panel">
+<h2>About MX Chronicles</h2>
+<p>MX Chronicles is a student-run publication dedicated to journalism, commentary, and storytelling.</p>
+</section>
+
+<section class="panel">
 <h2>Our Staff</h2>
-<ul id="staff-list"></ul>
+<ul id="staff-list" class="styled-list"></ul>
+</section>
+</main>
 
 <script>
-staffRef.on("value", snapshot => {
+staffRef.on("value", snapshot=>{
   const data = snapshot.val() || [];
   const list = document.getElementById("staff-list");
-  list.innerHTML = "";
-
-  data.forEach(name => {
-    const li = document.createElement("li");
-    li.textContent = name;
+  list.innerHTML="";
+  data.forEach(name=>{
+    const li=document.createElement("li");
+    li.textContent=name;
     list.appendChild(li);
   });
 });
