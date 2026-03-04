@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MX Chronicles • About</title>
+<title>About - MXChronicles</title>
 <link rel="stylesheet" href="style.css">
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
@@ -19,40 +19,42 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const staffRef = db.ref("staff");
 </script>
 </head>
-
 <body>
-
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
+  <nav class="top-nav">
+    <a href="index.html">HOME</a>
+    <a href="articles.html">ARTICLES</a>
+    <a href="about.html" class="active">ABOUT</a>
+    <a href="staff.html">STAFF PORTAL</a>
+  </nav>
 </header>
 
 <main class="container">
-<section class="panel">
-<h2>About MX Chronicles</h2>
-<p>MX Chronicles is a student-run publication dedicated to journalism, commentary, and storytelling.</p>
-</section>
-
-<section class="panel">
-<h2>Our Staff</h2>
-<ul id="staff-list" class="styled-list"></ul>
-</section>
+  <section class="panel">
+    <h2>Meet Our Staff</h2>
+    <div id="staff-list" class="staff-grid"></div>
+  </section>
 </main>
 
 <script>
 staffRef.on("value", snapshot=>{
   const data = snapshot.val() || [];
-  const list = document.getElementById("staff-list");
-  list.innerHTML="";
+  const container = document.getElementById("staff-list");
+  container.innerHTML="";
   data.forEach(name=>{
-    const li=document.createElement("li");
-    li.textContent=name;
-    list.appendChild(li);
+    const div = document.createElement("div");
+    div.className="staff-card";
+    div.innerHTML=`
+      <h3>${name}</h3>
+      <p>Staff member at MXChronicles.</p>
+    `;
+    container.appendChild(div);
   });
 });
 </script>
