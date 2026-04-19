@@ -9,6 +9,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBWjBUB1OjRXRghtMZ6ZMWQ1Kwk8aIjCoQ",
@@ -19,12 +20,20 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+<!-- ✅ FIX: prevent duplicate initialization -->
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+<!-- ✅ FIX: prevent db redeclaration crash -->
+var db = firebase.database();
 const articlesRef = db.ref("articles");
 </script>
 </head>
+
 <body>
+
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
   <nav class="top-nav">
@@ -40,29 +49,40 @@ const articlesRef = db.ref("articles");
 <script>
 function renderArticlesPage(){
   const container = document.getElementById("articles-grid");
+
   articlesRef.once("value").then(snap=>{
     const data = snap.val();
     container.innerHTML = "";
+
     if(!data){
-      container.innerHTML="<p>No articles available.</p>";
+      container.innerHTML = "<p>No articles available.</p>";
       return;
     }
-    Object.entries(data).forEach(([id,a])=>{
+
+    Object.entries(data).forEach(([id, a])=>{
       const card = document.createElement("div");
-      card.className="article-card";
-      card.onclick = ()=>{ localStorage.setItem("currentArticle", id); window.location.href="article.html"; };
-      card.innerHTML=`
-        ${a.image?`<img src="${a.image}" alt="${a.title}">`:""}
+      card.className = "article-card";
+
+      card.onclick = ()=>{
+        localStorage.setItem("currentArticle", id);
+        window.location.href = "article.html";
+      };
+
+      card.innerHTML = `
+        ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
         <h2>${a.title.toUpperCase()}</h2>
         <div class="meta">${a.author} · ${a.date} · Issue ${a.issue}</div>
         <p>${a.content.slice(0,160)}...</p>
       `;
+
       container.appendChild(card);
     });
   });
 }
 
+// Run
 renderArticlesPage();
 </script>
+
 </body>
 </html>
