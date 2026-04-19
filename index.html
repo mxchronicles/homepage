@@ -21,8 +21,15 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+<!-- ✅ FIX: prevent duplicate Firebase initialization -->
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+<!-- ✅ FIX: prevent db redeclaration crash -->
+var db = firebase.database();
+
 const articlesRef = db.ref("articles");
 const currentIssueRef = db.ref("currentIssue");
 </script>
@@ -94,6 +101,7 @@ function renderHomePage() {
           <div class="meta">${a.author} · ${a.date}</div>
           <p>${a.content.slice(0,120)}...</p>
         `;
+
         container.appendChild(article);
       });
     });
@@ -106,6 +114,7 @@ function openArticle(id) {
   window.location.href = "article.html";
 }
 
+// Run
 renderHomePage();
 </script>
 
