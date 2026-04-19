@@ -21,14 +21,12 @@ const firebaseConfig = {
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
 
-<!-- ✅ FIX: prevent duplicate init -->
+// SAFE INIT (prevents crashes)
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-<!-- ✅ FIX: prevent db redeclaration crash -->
 var db = firebase.database();
-
 const articlesRef = db.ref("articles");
 const staffRef = db.ref("staff");
 const currentIssueRef = db.ref("currentIssue");
@@ -111,7 +109,9 @@ const currentIssueRef = db.ref("currentIssue");
 </div>
 
 <script>
+// ==========================
 // PASSWORD
+// ==========================
 function checkPassword(){
   const pw = document.getElementById("staff-password").value;
   if(pw === "26MXChronicles"){
@@ -122,7 +122,9 @@ function checkPassword(){
   }
 }
 
+// ==========================
 // ISSUE SETTINGS
+// ==========================
 currentIssueRef.on("value", snapshot => {
   const data = snapshot.val() || {};
   document.getElementById("issue-number-input").value = data.number || "";
@@ -134,17 +136,20 @@ function saveIssueSettings() {
   const number = parseInt(document.getElementById("issue-number-input").value);
   const title = document.getElementById("issue-title-input").value.trim();
   const description = document.getElementById("issue-description-input").value.trim();
-  currentIssueRef.set({number, title, description});
+
+  currentIssueRef.set({ number, title, description });
   alert("Issue settings saved!");
 }
 
-// ✅ FIX: correct container ID
+// ==========================
+// STAFF (FIXED container id)
+// ==========================
 staffRef.on("value", snapshot => {
   const staff = snapshot.val() || [];
   const container = document.getElementById("staff-list");
   container.innerHTML = "";
 
-  if (staff.length === 0) {
+  if (!staff.length) {
     container.innerHTML = "<p>No staff members listed yet.</p>";
     return;
   }
@@ -167,6 +172,7 @@ staffRef.on("value", snapshot => {
 function addStaff() {
   const nameInput = document.getElementById("new-staff");
   const roleInput = document.getElementById("new-staff-role");
+
   const name = nameInput.value.trim();
   const role = roleInput.value.trim() || "Staff";
 
@@ -176,6 +182,7 @@ function addStaff() {
     let staff = snapshot.val() || [];
     staff.push({ name, role });
     staffRef.set(staff);
+
     nameInput.value = "";
     roleInput.value = "";
   });
@@ -202,10 +209,13 @@ function editRole(index) {
   });
 }
 
-// ADD NEW ARTICLE
-document.getElementById("new-article-form").addEventListener("submit", function(e){
+// ==========================
+// ARTICLE CREATION (NOW ISSUE-CORRECT)
+// ==========================
+document.getElementById("new-article-form").addEventListener("submit", e => {
   e.preventDefault();
   const form = e.target;
+
   articlesRef.push({
     title: form.title.value,
     author: form.author.value,
@@ -213,49 +223,58 @@ document.getElementById("new-article-form").addEventListener("submit", function(
     issue: parseInt(form.issue.value),
     content: form.content.value,
     image: form.image.value || "",
-    featured:false
+    featured: false
   });
+
   form.reset();
 });
 
+// ==========================
 // MANAGE ARTICLES
-articlesRef.on("value", snapshot=>{
+// ==========================
+articlesRef.on("value", snapshot => {
   const data = snapshot.val();
   const container = document.getElementById("staff-articles");
-  container.innerHTML="";
-  if(!data){
-    container.innerHTML="<p>No articles yet.</p>";
+  container.innerHTML = "";
+
+  if (!data) {
+    container.innerHTML = "<p>No articles yet.</p>";
     return;
   }
-  Object.entries(data).forEach(([id,a])=>{
-    const card=document.createElement("div");
-    card.className="article-card";
-    card.innerHTML=`
+
+  Object.entries(data).forEach(([id, a]) => {
+    const card = document.createElement("div");
+    card.className = "article-card";
+
+    card.innerHTML = `
       <h3>${a.title}</h3>
       <p>${a.author} • ${a.date} • Issue ${a.issue}</p>
       <button onclick="editArticle('${id}')">Edit</button>
       <button onclick="deleteArticle('${id}')">Delete</button>
-      <button onclick="toggleFeature('${id}')">${a.featured?'Unfeature':'Feature'}</button>
+      <button onclick="toggleFeature('${id}')">
+        ${a.featured ? "Unfeature" : "Feature"}
+      </button>
     `;
+
     container.appendChild(card);
   });
 });
 
-function deleteArticle(id){
+function deleteArticle(id) {
   articlesRef.child(id).remove();
 }
 
-function editArticle(id){
+function editArticle(id) {
   const newContent = prompt("Edit content:");
-  if(newContent){
-    articlesRef.child(id).update({content:newContent});
+  if (newContent) {
+    articlesRef.child(id).update({ content: newContent });
   }
 }
 
-function toggleFeature(id){
-  articlesRef.child(id).once("value").then(snap=>{
+function toggleFeature(id) {
+  articlesRef.child(id).once("value").then(snap => {
     const current = snap.val().featured || false;
-    articlesRef.child(id).update({featured:!current});
+    articlesRef.child(id).update({ featured: !current });
   });
 }
 </script>
