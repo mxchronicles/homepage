@@ -20,8 +20,15 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+<!-- ✅ FIX: prevent duplicate init -->
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+<!-- ✅ FIX: prevent db redeclaration crash -->
+var db = firebase.database();
+
 const articlesRef = db.ref("articles");
 const staffRef = db.ref("staff");
 const currentIssueRef = db.ref("currentIssue");
@@ -131,11 +138,10 @@ function saveIssueSettings() {
   alert("Issue settings saved!");
 }
 
-// STAFF MANAGEMENT
- // STAFF MANAGEMENT
+// ✅ FIX: correct container ID
 staffRef.on("value", snapshot => {
   const staff = snapshot.val() || [];
-  const container = document.getElementById("staff-container");
+  const container = document.getElementById("staff-list");
   container.innerHTML = "";
 
   if (staff.length === 0) {
@@ -143,58 +149,59 @@ staffRef.on("value", snapshot => {
     return;
   }
 
-  staff.forEach(member => {
-    const card = document.createElement("div");
-    card.className = "staff-card";
+  staff.forEach((member, i) => {
+    const div = document.createElement("div");
+    div.className = "list-item";
 
-    card.innerHTML = `
-      <h3>${member.name}</h3>
-      <p>${member.role || "Staff"}</p>
+    div.innerHTML = `
+      <strong>${member.name}</strong> - ${member.role || "Staff"}
+      <button onclick="removeStaff(${i})">Remove</button>
+      <button onclick="editRole(${i})">Edit Role</button>
     `;
 
-    container.appendChild(card);
+    container.appendChild(div);
   });
 });
 
-  // ADD STAFF (with optional role)
-  function addStaff() {
-    const nameInput = document.getElementById("new-staff");
-    const roleInput = document.getElementById("new-staff-role");
-    const name = nameInput.value.trim();
-    const role = roleInput.value.trim() || "Staff";
+// ADD STAFF
+function addStaff() {
+  const nameInput = document.getElementById("new-staff");
+  const roleInput = document.getElementById("new-staff-role");
+  const name = nameInput.value.trim();
+  const role = roleInput.value.trim() || "Staff";
 
-    if (!name) return;
+  if (!name) return;
 
-    staffRef.once("value").then(snapshot => {
-      let staff = snapshot.val() || [];
-      staff.push({ name, role });
+  staffRef.once("value").then(snapshot => {
+    let staff = snapshot.val() || [];
+    staff.push({ name, role });
+    staffRef.set(staff);
+    nameInput.value = "";
+    roleInput.value = "";
+  });
+}
+
+// REMOVE STAFF
+function removeStaff(index) {
+  staffRef.once("value").then(snapshot => {
+    let staff = snapshot.val() || [];
+    staff.splice(index, 1);
+    staffRef.set(staff);
+  });
+}
+
+// EDIT ROLE
+function editRole(index) {
+  staffRef.once("value").then(snapshot => {
+    let staff = snapshot.val() || [];
+    const newRole = prompt("Edit role:", staff[index].role || "Staff");
+    if (newRole !== null) {
+      staff[index].role = newRole;
       staffRef.set(staff);
-      nameInput.value = "";
-      roleInput.value = "";
-    });
-  }
+    }
+  });
+}
 
-  // REMOVE STAFF
-  function removeStaff(index) {
-    staffRef.once("value").then(snapshot => {
-      let staff = snapshot.val() || [];
-      staff.splice(index, 1);
-      staffRef.set(staff);
-    });
-  }
-
-  // EDIT ROLE
-  function editRole(index) {
-    staffRef.once("value").then(snapshot => {
-      let staff = snapshot.val() || [];
-      const newRole = prompt("Edit role:", staff[index].role || "Staff");
-      if (newRole !== null) {
-        staff[index].role = newRole;
-        staffRef.set(staff);
-      }
-    });
-  }
-  
 // ADD NEW ARTICLE
 document.getElementById("new-article-form").addEventListener("submit", function(e){
   e.preventDefault();
