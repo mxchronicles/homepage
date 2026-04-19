@@ -19,11 +19,18 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+// ✅ FIX: prevent double initialization
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+// ✅ FIX: use var instead of const
+var db = firebase.database();
 const staffRef = db.ref("staff");
 </script>
 </head>
+
 <body>
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
@@ -36,16 +43,30 @@ const staffRef = db.ref("staff");
 </header>
 
 <main class="container">
+
+  <!-- ✅ Added description (you asked for this back) -->
+  <section class="panel">
+    <h2>About Middlesex Chronicles</h2>
+    <p>
+      The Middlesex Chronicles is a student-run publication dedicated to sharing
+      stories, perspectives, and voices from the Middlesex community. From news
+      and interviews to opinion and creative work, each issue reflects the ideas
+      and experiences of its contributors.
+    </p>
+  </section>
+
   <section class="panel">
     <h2>Meet Our Staff</h2>
     <div id="staff-list" class="staff-grid"></div>
   </section>
+
 </main>
 
 <script>
+// ✅ FIX: correct container ID
 staffRef.on("value", snapshot => {
   const staff = snapshot.val() || [];
-  const container = document.getElementById("staff-container");
+  const container = document.getElementById("staff-list");
   container.innerHTML = "";
 
   staff.forEach(member => {
