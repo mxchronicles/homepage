@@ -22,14 +22,14 @@ const firebaseConfig = {
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
 
-// safe init
+// safe init (prevents duplicate crashes)
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
 var db = firebase.database();
 const articlesRef = db.ref("articles");
-const currentIssueRef = db.ref("currentIssue");
+const issuesRef = db.ref("issues");
 </script>
 
 <style>
@@ -90,8 +90,10 @@ function renderHomePage() {
   if (!container || !select) return;
 
   let allArticles = {};
+  let issuesList = [];
   let currentIssue = null;
 
+  // 🔥 Load articles
   articlesRef.on("value", snap => {
     allArticles = snap.val() || {};
 
@@ -99,9 +101,13 @@ function renderHomePage() {
       Object.values(allArticles).map(a => a.issue).filter(Boolean)
     )].sort((a,b) => a-b);
 
-    select.innerHTML = issues.map(i => `<option value="${i}">Issue ${i}</option>`).join("");
+    issuesList = issues;
 
-    if (!currentIssue) {
+    select.innerHTML = issues.map(i =>
+      `<option value="${i}">Issue ${i}</option>`
+    ).join("");
+
+    if (!currentIssue && issues.length > 0) {
       currentIssue = issues[issues.length - 1];
       select.value = currentIssue;
     }
@@ -109,12 +115,16 @@ function renderHomePage() {
     renderIssue(currentIssue);
   });
 
+  // 🔥 Issue toggle
   select.addEventListener("change", () => {
     currentIssue = parseInt(select.value);
     renderIssue(currentIssue);
   });
 
+  // 🔥 Render function
   function renderIssue(issueNum) {
+    if (!issueNum) return;
+
     const filtered = Object.entries(allArticles)
       .map(([id, a]) => ({ id, ...a }))
       .filter(a => a.issue == issueNum);
@@ -122,6 +132,8 @@ function renderHomePage() {
     container.innerHTML = "";
 
     document.getElementById("issue-number").textContent = issueNum;
+
+    // (kept safe placeholders for future issue metadata expansion)
     document.getElementById("issue-title").textContent = "";
     document.getElementById("issue-description").textContent = "";
 
