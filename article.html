@@ -20,13 +20,20 @@ const firebaseConfig = {
   messagingSenderId: "855683773579",
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+<!-- FIX: prevent duplicate initialization -->
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+<!-- FIX: prevent "db already declared" crash -->
+var db = firebase.database();
 const articlesRef = db.ref("articles");
 </script>
 </head>
 
 <body class="body-article">
+
 <header class="top-bar">
   <div class="masthead">MX CHRONICLES</div>
   <nav class="top-nav">
@@ -45,7 +52,7 @@ const articlesRef = db.ref("articles");
 function renderArticlePage() {
   const container = document.getElementById("article-container");
 
-  // Get article id from URL
+  // Get article id from URL or localStorage
   const params = new URLSearchParams(window.location.search);
   const articleId = params.get("id") || localStorage.getItem("currentArticle");
 
@@ -56,12 +63,12 @@ function renderArticlePage() {
 
   articlesRef.child(articleId).once("value").then(snapshot => {
     const a = snapshot.val();
+
     if (!a) {
       container.innerHTML = "<p>Article not found.</p>";
       return;
     }
 
-    // Use vintage/newspaper style layout
     container.innerHTML = `
       <article class="article-page">
         <h1 class="article-title">${a.title.toUpperCase()}</h1>
@@ -73,8 +80,9 @@ function renderArticlePage() {
   });
 }
 
-// Call render
+// Run page render
 renderArticlePage();
 </script>
+
 </body>
 </html>
