@@ -22,7 +22,7 @@ const firebaseConfig = {
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
 
-// safe init (prevents duplicate crashes)
+// safe init
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -90,52 +90,57 @@ function renderHomePage() {
   if (!container || !select) return;
 
   let allArticles = {};
-  let issuesList = [];
+  let allIssues = {};
   let currentIssue = null;
 
-  // 🔥 Load articles
-  articlesRef.on("value", snap => {
-    allArticles = snap.val() || {};
+  // LOAD ISSUES (source of truth)
+  issuesRef.on("value", snap => {
+    allIssues = snap.val() || {};
 
-    const issues = [...new Set(
-      Object.values(allArticles).map(a => a.issue).filter(Boolean)
-    )].sort((a,b) => a-b);
+    const issueNumbers = Object.keys(allIssues)
+      .map(n => parseInt(n))
+      .sort((a,b) => a - b);
 
-    issuesList = issues;
-
-    select.innerHTML = issues.map(i =>
+    // Populate dropdown
+    select.innerHTML = issueNumbers.map(i =>
       `<option value="${i}">Issue ${i}</option>`
     ).join("");
 
-    if (!currentIssue && issues.length > 0) {
-      currentIssue = issues[issues.length - 1];
+    if (!currentIssue && issueNumbers.length > 0) {
+      currentIssue = issueNumbers[issueNumbers.length - 1];
       select.value = currentIssue;
     }
 
     renderIssue(currentIssue);
   });
 
-  // 🔥 Issue toggle
+  // LOAD ARTICLES
+  articlesRef.on("value", snap => {
+    allArticles = snap.val() || {};
+    renderIssue(currentIssue);
+  });
+
+  // TOGGLE CHANGE
   select.addEventListener("change", () => {
     currentIssue = parseInt(select.value);
     renderIssue(currentIssue);
   });
 
-  // 🔥 Render function
+  // RENDER FUNCTION
   function renderIssue(issueNum) {
     if (!issueNum) return;
+
+    const issue = allIssues[issueNum] || {};
+
+    document.getElementById("issue-number").textContent = issue.number || issueNum;
+    document.getElementById("issue-title").textContent = issue.title || "";
+    document.getElementById("issue-description").textContent = issue.description || "";
 
     const filtered = Object.entries(allArticles)
       .map(([id, a]) => ({ id, ...a }))
       .filter(a => a.issue == issueNum);
 
     container.innerHTML = "";
-
-    document.getElementById("issue-number").textContent = issueNum;
-
-    // (kept safe placeholders for future issue metadata expansion)
-    document.getElementById("issue-title").textContent = "";
-    document.getElementById("issue-description").textContent = "";
 
     filtered.forEach(a => {
       const article = document.createElement("article");
