@@ -9,18 +9,16 @@
 
   const db = firebase.database();
 
-  // 🔥 NEW REFS (multi-issue system)
   const articlesRef = db.ref("articles");
   const activeIssueRef = db.ref("activeIssue");
 
   // ==========================
-  // ARTICLES LIST PAGE (FILTERED)
+  // ARTICLES LIST PAGE
   // ==========================
   function renderArticles() {
     const grid = document.getElementById("articles-grid");
     if (!grid) return;
 
-    // Listen for active issue first
     activeIssueRef.on("value", activeSnap => {
       const activeIssue = activeSnap.val();
 
@@ -35,7 +33,7 @@
 
         Object.entries(data)
           .map(([id, a]) => ({ id, ...a }))
-          .filter(a => a.issue == activeIssue) // 🔥 KEY FILTER
+          .filter(a => a.issue == activeIssue)
           .forEach(a => {
             const card = document.createElement("div");
             card.className = "article-card";
@@ -55,7 +53,7 @@
   }
 
   // ==========================
-  // SINGLE ARTICLE PAGE
+  // SINGLE ARTICLE PAGE (UPDATED)
   // ==========================
   function renderArticlePage() {
     const container = document.getElementById("article-container");
@@ -79,13 +77,56 @@
 
       container.innerHTML = `
         <article class="article-page">
-          <h1>${a.title}</h1>
-          <p>${a.author || ""} • ${a.date || ""} • Issue ${a.issue}</p>
-          ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-          <p style="white-space: pre-line;">${a.content || ""}</p>
+
+          <header class="article-header">
+            <h1>${a.title}</h1>
+            <div class="article-meta">
+              ${a.author || ""} • ${a.date || ""} • Issue ${a.issue || "1"}
+            </div>
+          </header>
+
+          ${a.image ? `
+            <div class="article-cover">
+              <img src="${a.image}" alt="${a.title}">
+            </div>
+          ` : ""}
+
+          <div class="text-controls">
+            <span>Text size:</span>
+            <button onclick="setTextSize('small')">A-</button>
+            <button onclick="setTextSize('medium')">A</button>
+            <button onclick="setTextSize('large')">A+</button>
+          </div>
+
+          <div id="article-text" class="article-text medium">
+            ${a.content || ""}
+          </div>
+
         </article>
       `;
+
+      applySavedTextSize();
     });
+  }
+
+  // ==========================
+  // TEXT SIZE SYSTEM
+  // ==========================
+  window.setTextSize = function(size) {
+    const el = document.getElementById("article-text");
+    if (!el) return;
+
+    el.classList.remove("small", "medium", "large");
+    el.classList.add(size);
+
+    localStorage.setItem("textSize", size);
+  };
+
+  function applySavedTextSize() {
+    const saved = localStorage.getItem("textSize") || "medium";
+    const el = document.getElementById("article-text");
+    if (!el) return;
+    setTextSize(saved);
   }
 
   // ==========================
