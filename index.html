@@ -22,7 +22,7 @@ const firebaseConfig = {
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
 
-// safe init
+// SAFE INIT
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -93,38 +93,51 @@ function renderHomePage() {
   let allIssues = {};
   let currentIssue = null;
 
-  // LOAD ISSUES (source of truth)
+  let issuesLoaded = false;
+  let articlesLoaded = false;
+
+  // LOAD ISSUES (PRIMARY SOURCE)
   issuesRef.on("value", snap => {
     allIssues = snap.val() || {};
 
     const issueNumbers = Object.keys(allIssues)
       .map(n => parseInt(n))
-      .sort((a,b) => a - b);
+      .sort((a, b) => a - b);
 
     // Populate dropdown
     select.innerHTML = issueNumbers.map(i =>
       `<option value="${i}">Issue ${i}</option>`
     ).join("");
 
+    // Default to latest issue
     if (!currentIssue && issueNumbers.length > 0) {
       currentIssue = issueNumbers[issueNumbers.length - 1];
       select.value = currentIssue;
     }
 
-    renderIssue(currentIssue);
+    issuesLoaded = true;
+    tryRender();
   });
 
   // LOAD ARTICLES
   articlesRef.on("value", snap => {
     allArticles = snap.val() || {};
-    renderIssue(currentIssue);
+    articlesLoaded = true;
+    tryRender();
   });
 
-  // TOGGLE CHANGE
+  // ISSUE TOGGLE CHANGE
   select.addEventListener("change", () => {
     currentIssue = parseInt(select.value);
     renderIssue(currentIssue);
   });
+
+  // ENSURE BOTH LOADED BEFORE RENDER
+  function tryRender() {
+    if (issuesLoaded && articlesLoaded) {
+      renderIssue(currentIssue);
+    }
+  }
 
   // RENDER FUNCTION
   function renderIssue(issueNum) {
@@ -132,15 +145,25 @@ function renderHomePage() {
 
     const issue = allIssues[issueNum] || {};
 
-    document.getElementById("issue-number").textContent = issue.number || issueNum;
-    document.getElementById("issue-title").textContent = issue.title || "";
-    document.getElementById("issue-description").textContent = issue.description || "";
+    document.getElementById("issue-number").textContent =
+      issue.number || issueNum;
+
+    document.getElementById("issue-title").textContent =
+      issue.title || "";
+
+    document.getElementById("issue-description").textContent =
+      issue.description || "";
 
     const filtered = Object.entries(allArticles)
       .map(([id, a]) => ({ id, ...a }))
       .filter(a => a.issue == issueNum);
 
     container.innerHTML = "";
+
+    if (filtered.length === 0) {
+      container.innerHTML = "<p>No articles in this issue yet.</p>";
+      return;
+    }
 
     filtered.forEach(a => {
       const article = document.createElement("article");
@@ -160,12 +183,13 @@ function renderHomePage() {
   }
 }
 
-// Redirect
+// REDIRECT
 function openArticle(id) {
   localStorage.setItem("currentArticle", id);
   window.location.href = "article.html";
 }
 
+// RUN
 renderHomePage();
 </script>
 
