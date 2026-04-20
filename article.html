@@ -21,15 +21,71 @@ const firebaseConfig = {
   appId: "1:855683773579:web:199aba0a59a5e09701908e"
 };
 
-<!-- FIX: prevent duplicate initialization -->
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-<!-- FIX: prevent "db already declared" crash -->
 var db = firebase.database();
 const articlesRef = db.ref("articles");
 </script>
+
+<style>
+/* FIX ARTICLE WIDTH ISSUE */
+.article-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* WIDE CONSISTENT ARTICLE BLOCK */
+.article-page {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* HEADER */
+.article-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.article-meta {
+  font-size: 14px;
+  color: #777;
+}
+
+/* IMAGE FULL WIDTH */
+.article-cover img {
+  width: 100%;
+  height: auto;
+  margin: 20px 0;
+}
+
+/* TEXT CONTROLS */
+.text-controls {
+  text-align: right;
+  margin: 10px 0;
+}
+
+.text-controls button {
+  margin-left: 5px;
+  padding: 5px 8px;
+}
+
+/* TEXT BLOCK */
+.article-text {
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+/* TEXT SIZES */
+.article-text.small { font-size: 14px; }
+.article-text.medium { font-size: 18px; }
+.article-text.large { font-size: 22px; }
+</style>
+
 </head>
 
 <body class="body-article">
@@ -44,45 +100,9 @@ const articlesRef = db.ref("articles");
   </nav>
 </header>
 
-<main id="article-container" class="article-page-container">
-  <!-- Article content will be injected here -->
-</main>
+<main id="article-container" class="article-page-container"></main>
 
-<script>
-function renderArticlePage() {
-  const container = document.getElementById("article-container");
-
-  // Get article id from URL or localStorage
-  const params = new URLSearchParams(window.location.search);
-  const articleId = params.get("id") || localStorage.getItem("currentArticle");
-
-  if (!articleId) {
-    container.innerHTML = "<p>Article not found.</p>";
-    return;
-  }
-
-  articlesRef.child(articleId).once("value").then(snapshot => {
-    const a = snapshot.val();
-
-    if (!a) {
-      container.innerHTML = "<p>Article not found.</p>";
-      return;
-    }
-
-    container.innerHTML = `
-      <article class="article-page">
-        <h1 class="article-title">${a.title.toUpperCase()}</h1>
-        <div class="article-meta">${a.author} · ${a.date} · Issue ${a.issue || '1'}</div>
-        ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
-        <p class="article-content" style="white-space: pre-line;">${a.content}</p>
-      </article>
-    `;
-  });
-}
-
-// Run page render
-renderArticlePage();
-</script>
+<script src="articles.js" defer></script>
 
 </body>
 </html>
