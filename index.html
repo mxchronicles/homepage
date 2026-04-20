@@ -42,6 +42,28 @@ const issuesRef = db.ref("issues");
   padding: 6px 10px;
   font-size: 14px;
 }
+
+/* 🔥 FIX: GRID LAYOUT FOR ARTICLES */
+#home-articles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* 🔥 ENSURE TILES DON'T STRETCH FULL WIDTH */
+.article-home-tile {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.article-home-tile:hover {
+  transform: translateY(-4px);
+}
+
+.article-home-tile img {
+  width: 100%;
+  height: auto;
+}
 </style>
 
 </head>
@@ -96,7 +118,7 @@ function renderHomePage() {
   let issuesLoaded = false;
   let articlesLoaded = false;
 
-  // LOAD ISSUES (PRIMARY SOURCE)
+  // LOAD ISSUES
   issuesRef.on("value", snap => {
     allIssues = snap.val() || {};
 
@@ -104,12 +126,10 @@ function renderHomePage() {
       .map(n => parseInt(n))
       .sort((a, b) => a - b);
 
-    // Populate dropdown
     select.innerHTML = issueNumbers.map(i =>
       `<option value="${i}">Issue ${i}</option>`
     ).join("");
 
-    // Default to latest issue
     if (!currentIssue && issueNumbers.length > 0) {
       currentIssue = issueNumbers[issueNumbers.length - 1];
       select.value = currentIssue;
@@ -126,20 +146,18 @@ function renderHomePage() {
     tryRender();
   });
 
-  // ISSUE TOGGLE CHANGE
+  // TOGGLE
   select.addEventListener("change", () => {
     currentIssue = parseInt(select.value);
     renderIssue(currentIssue);
   });
 
-  // ENSURE BOTH LOADED BEFORE RENDER
   function tryRender() {
     if (issuesLoaded && articlesLoaded) {
       renderIssue(currentIssue);
     }
   }
 
-  // RENDER FUNCTION
   function renderIssue(issueNum) {
     if (!issueNum) return;
 
@@ -183,13 +201,11 @@ function renderHomePage() {
   }
 }
 
-// REDIRECT
 function openArticle(id) {
   localStorage.setItem("currentArticle", id);
   window.location.href = "article.html";
 }
 
-// RUN
 renderHomePage();
 </script>
 
