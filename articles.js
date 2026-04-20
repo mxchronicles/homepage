@@ -2,44 +2,54 @@
   // ==========================
   // SAFE FIREBASE ACCESS
   // ==========================
-
   if (!window.firebase) {
     console.error("Firebase not loaded before articles.js");
     return;
   }
 
-  // DO NOT reinitialize Firebase here (important fix)
   const db = firebase.database();
+
+  // 🔥 NEW REFS (multi-issue system)
   const articlesRef = db.ref("articles");
+  const activeIssueRef = db.ref("activeIssue");
 
   // ==========================
-  // ARTICLES LIST PAGE
+  // ARTICLES LIST PAGE (FILTERED)
   // ==========================
   function renderArticles() {
     const grid = document.getElementById("articles-grid");
     if (!grid) return;
 
-    articlesRef.on("value", snapshot => {
-      const data = snapshot.val();
-      grid.innerHTML = "";
+    // Listen for active issue first
+    activeIssueRef.on("value", activeSnap => {
+      const activeIssue = activeSnap.val();
 
-      if (!data) {
-        grid.innerHTML = "<p>No articles yet.</p>";
-        return;
-      }
+      articlesRef.on("value", snapshot => {
+        const data = snapshot.val();
+        grid.innerHTML = "";
 
-      Object.entries(data).forEach(([id, a]) => {
-        const card = document.createElement("div");
-        card.className = "article-card";
+        if (!data) {
+          grid.innerHTML = "<p>No articles yet.</p>";
+          return;
+        }
 
-        card.innerHTML = `
-          <h2>${a.title}</h2>
-          <p>${a.author || ""} • ${a.date || ""}</p>
-          <p>${a.content ? a.content.substring(0,150) + "..." : ""}</p>
-          <a href="article.html?id=${id}">Read More</a>
-        `;
+        Object.entries(data)
+          .map(([id, a]) => ({ id, ...a }))
+          .filter(a => a.issue == activeIssue) // 🔥 KEY FILTER
+          .forEach(a => {
+            const card = document.createElement("div");
+            card.className = "article-card";
 
-        grid.appendChild(card);
+            card.innerHTML = `
+              ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+              <h2>${a.title}</h2>
+              <p>${a.author || ""} • ${a.date || ""} • Issue ${a.issue}</p>
+              <p>${a.content ? a.content.substring(0,150) + "..." : ""}</p>
+              <a href="article.html?id=${a.id}">Read More</a>
+            `;
+
+            grid.appendChild(card);
+          });
       });
     });
   }
@@ -68,10 +78,11 @@
       }
 
       container.innerHTML = `
-        <article>
+        <article class="article-page">
           <h1>${a.title}</h1>
-          <p>${a.author || ""} • ${a.date || ""}</p>
-          <div>${a.content || ""}</div>
+          <p>${a.author || ""} • ${a.date || ""} • Issue ${a.issue}</p>
+          ${a.image ? `<img src="${a.image}" alt="${a.title}">` : ""}
+          <p style="white-space: pre-line;">${a.content || ""}</p>
         </article>
       `;
     });
